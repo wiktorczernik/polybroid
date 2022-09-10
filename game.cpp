@@ -4,12 +4,15 @@
 #include "PolyMath.h"
 #include <iostream>
 #include <regex>
+#include "core.h"
 using namespace std;
 
 /* Test Framework realization */
 class MyFramework : public Framework {
 private:
 	Vector2 targetScreenSize;
+	GameObject object;
+	GameObject objectTwo;
 	Sprite* blueBlock;
 public:
 	virtual void PreInit(int& width, int& height, bool& fullscreen)
@@ -32,8 +35,7 @@ public:
 	virtual bool Tick() {
 		//Sprite* sprait = createSprite("E:/dragonik/2022_win64/data/01-Breakout-Tiles.jpg");
         drawTestBackground();
-		setSpriteSize(blueBlock, 50, 50);
-		drawSprite(blueBlock, 0, 0);
+
 		return false;
 	}
 
