@@ -45,7 +45,7 @@ void AssetManager::GetAssetPathsByType(fs::path* result, AssetType type, int amo
 			if (p.path().extension() == ext) {
 				result[count] = p.path();
 				count++;
-				std::cout << "Loaded block num." << count << " " << p.path() << '\n';
+				std::cout << "Loaded asset " << p.path() << '\n';
 			}
 		}
 	}
@@ -59,9 +59,53 @@ void AssetManager::ReadFile(std::string* result, fs::path filePath, int amount) 
 	int index = 0;
 	if (file.is_open()) {
 		while (getline(file, result[index])) {
-			cout << result[index] << '\n';
+			if (index>=amount){
+				break;
+			}
 			index++;
 		}
 		file.close();
 	}
+}
+
+BlockAsset AssetManager::GetBlockAsset(fs::path path) {
+	std::string lines[4];
+	int id;
+	int health;
+	fs::path idleSprite = path.parent_path();
+	fs::path brokenSprite = path.parent_path();
+	BlockAsset result = BlockAsset();
+	try {
+		ReadFile(lines, path, 4);
+
+		id = std::stoi(lines[0]);
+		health = std::stoi(lines[1]);
+
+		idleSprite += "\\" + lines[2];
+		brokenSprite += "\\" + lines[3];
+
+		result.id = id;
+		result.path = path;
+		result.health = health;
+		result.idleSprite = idleSprite;
+		result.brokenSprite = brokenSprite;
+
+		return result;
+	}
+	catch(std::exception& e) {
+		cout << "Can't read file: " << e.what();
+		return result;
+	}
+}
+void AssetManager::GetBlockAssets(BlockAsset* result) {
+	fs::path paths[3];
+	GetAssetPathsByType(paths, AssetBlock, 3);
+	for each (fs::path path in paths)
+	{
+		BlockAsset block = GetBlockAsset(path);
+		result[block.id] = block;
+	}
+}
+void AssetManager::Setup() {
+	GetBlockAssets(blocks);
 }

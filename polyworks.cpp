@@ -12,24 +12,22 @@ using namespace std;
 /* Test Framework realization */
 class Polyworks : public Framework {
 private:
-	Vector2 targetScreenSize;
 	Sprite* blueBlock;
 	AssetManager assetManager;
+	BlockAsset blockAsset;
 public:
+	Vector2 targetScreenSize;
 	virtual void PreInit(int& width, int& height, bool& fullscreen)
 	{
 		width = targetScreenSize.x;
 		height = targetScreenSize.y;
 		fullscreen = false;
+		assetManager = AssetManager();
 	}
 
 	virtual bool Init() {
-		assetManager = AssetManager();
-		fs::path paths[3];
-		assetManager.GetAssetPathsByType(paths, AssetBlock, sizeof(paths));
-		std::string lines[24];
-		assetManager.ReadFile(lines, paths[0], 3);
-		blueBlock = createSprite("E:/dragonik/2022_win64/data/01-Breakout-Tiles.jpg");
+		assetManager.Setup();
+		blueBlock = createSprite(assetManager.blocks[2].idleSprite.string().c_str());
 		return true;
 	}
 
@@ -38,7 +36,6 @@ public:
 	}
 
 	virtual bool Tick() {
-		//Sprite* sprait = createSprite("E:/dragonik/2022_win64/data/01-Breakout-Tiles.jpg");
         drawTestBackground();
 		setSpriteSize(blueBlock, 50, 50);
 		drawSprite(blueBlock, 50, 50);
@@ -64,15 +61,18 @@ public:
 	{
 		return "Arcanoid";
 	}
-	Polyworks(Vector2 screenSize) {
-		targetScreenSize = screenSize;
+	Polyworks() {
+		assetManager = AssetManager();
 	}
 };
 int main(int argc, char* argv[])
 {
+	Polyworks* framework = new Polyworks();
+
 	Vector2 defaultScreenSize = Vector2(800, 600);
 	Vector2 screenSize = defaultScreenSize;
 	string command;
+
 	switch (argc)
 	{
 	case 1:
@@ -91,5 +91,8 @@ int main(int argc, char* argv[])
 		break;
 
 	}
-	return run(new Polyworks(screenSize));
+
+	framework->targetScreenSize = screenSize;
+
+	return run(framework);
 }
