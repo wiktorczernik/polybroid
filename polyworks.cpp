@@ -4,16 +4,17 @@
 #include "PolyMath.h"
 #include <iostream>
 #include <regex>
-#include "core.h"
+#include "Objects.h"
+#include "Managers.h"
+
 using namespace std;
 
 /* Test Framework realization */
-class MyFramework : public Framework {
+class Polyworks : public Framework {
 private:
 	Vector2 targetScreenSize;
-	GameObject object;
-	GameObject objectTwo;
 	Sprite* blueBlock;
+	AssetManager assetManager;
 public:
 	virtual void PreInit(int& width, int& height, bool& fullscreen)
 	{
@@ -23,7 +24,11 @@ public:
 	}
 
 	virtual bool Init() {
-
+		assetManager = AssetManager();
+		fs::path paths[3];
+		assetManager.GetAssetPathsByType(paths, AssetBlock, sizeof(paths));
+		std::string lines[24];
+		assetManager.ReadFile(lines, paths[0], 3);
 		blueBlock = createSprite("E:/dragonik/2022_win64/data/01-Breakout-Tiles.jpg");
 		return true;
 	}
@@ -35,6 +40,8 @@ public:
 	virtual bool Tick() {
 		//Sprite* sprait = createSprite("E:/dragonik/2022_win64/data/01-Breakout-Tiles.jpg");
         drawTestBackground();
+		setSpriteSize(blueBlock, 50, 50);
+		drawSprite(blueBlock, 50, 50);
 
 		return false;
 	}
@@ -57,12 +64,11 @@ public:
 	{
 		return "Arcanoid";
 	}
-	MyFramework(Vector2 screenSize) {
+	Polyworks(Vector2 screenSize) {
 		targetScreenSize = screenSize;
 	}
 };
-
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
 	Vector2 defaultScreenSize = Vector2(800, 600);
 	Vector2 screenSize = defaultScreenSize;
@@ -78,12 +84,12 @@ int main(int argc, char *argv[])
 				screenSize = Vector2(stoi(argv[2]), stoi(argv[3]));
 				break;
 			}
-			catch (exception e) {cout << e.what(); }
+			catch (exception e) { cout << e.what(); }
 		}
 	default:
 		cout << "Wrong command line syntax. Usage: \"polybroid.exe -window <width> <height>\"" << endl;
 		break;
-		
+
 	}
-	return run(new MyFramework(screenSize));
+	return run(new Polyworks(screenSize));
 }
