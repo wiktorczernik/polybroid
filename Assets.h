@@ -25,7 +25,7 @@ class MapAsset : Asset {
 public:
 	fs::path background;
 	int id;
-	int terrain[48][12];
+	int terrain[16][8];
 };
 class VisualAsset : public Asset {
 public:

@@ -100,15 +100,15 @@ void AssetManager::ReadFile(std::string* result, fs::path filePath, int amount) 
 }
 
 MapAsset AssetManager::GetMapAsset(fs::path path) {
-	std::string lines[50];
+	std::string lines[18];
 	MapAsset result = MapAsset();
 	try {
-		ReadFile(lines, path, 50);
+		ReadFile(lines, path, 18);
 
 		result.id = std::stoi(lines[0]);
 		int value = 0;
-		for (int x = 2; x < 50; x++) {
-			for (int y = 0; y < 12; y++) {
+		for (int x = 2; x < 18; x++) {
+			for (int y = 0; y < 8; y++) {
 				value = std::stoi(string() + lines[x].at(y));
 				result.terrain[x - 2][y] = value;
 				cout << value;

@@ -29,6 +29,9 @@ private:
 
 	Vector2 blockSize;
 
+	float abilitySpawnDelay;
+	float abilitySpawnCooldown;
+
 	unsigned int score;
 	int mapIndex;
 
@@ -107,32 +110,38 @@ private:
 		int squareWidth = std::min(cmdScreen.x, cmdScreen.y);
 		borderArea = BoundingBox(Vector2(0, 0), Vector2(squareWidth, 0), Vector2(0, squareWidth), Vector2(squareWidth, squareWidth));
 		mapArea = borderArea;
+
 		mapArea.b.x *= 0.955;
 		mapArea.d.x *= 0.955;
 		mapArea.a.x = borderArea.b.x - mapArea.b.x;
+		mapArea.c.x = mapArea.a.x;
+		
 		mapArea.a.y = mapArea.a.x;
 		mapArea.b.y = mapArea.a.y;
-		mapArea.c.x = mapArea.a.x;
-		blockSize = Vector2(mapArea.MaxX()/12, mapArea.MaxY()/22);
+
+		cout << mapArea.MaxY();
+
+		blockSize = Vector2((mapArea.MaxX()-mapArea.MinX()) / 8, (mapArea.MaxY() - mapArea.MinX()) / 16);
 	}
 
 #pragma region Map
 	void InstantiateMap(int& index) {
-		bullets.clear();
-		blocks.clear();
 		MapAsset& map = assetManager.maps[index];
+
 		int value = 0;
-		for (int x = 0; x < 48; x++) {
-			for (int y = 0; y < 12; y++) {
+		for (int x = 0; x < 16; x++) {
+			for (int y = 0; y < 8; y++) {
 				value = map.terrain[x][y];
 				if (value != 0) {
 					InstantiateBlock(assetManager.blocks[value - 1], y, x);
 				}
 			}
 		}
+
 	}
 	void DestroyMap() {
-
+		bullets.clear();
+		blocks.clear();
 	}
 	void NextMap() {
 		DestroyMap();
@@ -166,7 +175,7 @@ public:
 		SetupOverlay();
 
 		int i = 0;
-		InstantiateMap(i);
+		NextMap();
 		return true;
 	}
 
@@ -191,6 +200,22 @@ public:
 	}
 
 	virtual void onKeyReleased(FRKey k) {
+		switch (k)
+		{
+		case FRKey::RIGHT:
+			break;
+		case FRKey::LEFT:
+			break;
+		case FRKey::DOWN:
+			break;
+		case FRKey::UP:
+			NextMap();
+			break;
+		case FRKey::COUNT:
+			break;
+		default:
+			break;
+		}
 	}
 	
 	virtual const char* GetTitle() override
