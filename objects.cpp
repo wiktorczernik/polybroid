@@ -8,8 +8,10 @@ Timer::Timer() {
 }
 void Timer::Setup(bool* Trigger, unsigned int TriggerTime, bool AutoRestart) {
 	trigger = Trigger;
+	*trigger = false;
 	triggerTime = TriggerTime;
 	autoRestart = AutoRestart;
+	currentTime = 0;
 }
 
 void Timer::Tick(int deltaTime) {
@@ -26,7 +28,8 @@ void Timer::Tick(int deltaTime) {
 	}
 }
 void Timer::Restart() {
-
+	*trigger = false;
+	currentTime = 0;
 }
 void Object::Scale(int x, int y) {
 	scale.x += x;

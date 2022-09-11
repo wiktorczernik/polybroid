@@ -36,11 +36,21 @@ private:
 	int mapIndex;
 	int blocksToDestroy;
 
+
+	Timer abilityTimer;
+	bool canAbilitySpawn;
+
 	int deltaTime;
 	clock_t previousTickTime;
 	clock_t currentTickTime;
 
 	void GameTick() {
+		abilityTimer.Tick(deltaTime);
+
+		if (canAbilitySpawn) {
+			cout << "\n\n" << "ABILITY CAN SPAWN" << "\n\n";
+		}
+
 		std::list<Block>::iterator i = blocks.begin();
 
 		list<Block>::const_iterator itr = blocks.cbegin();
@@ -141,6 +151,8 @@ private:
 		blocksToDestroy = 0;
 		mapIndex = -1;
 
+		abilityTimer.Setup(&canAbilitySpawn, 10000, true);
+
 		int squareWidth = std::min(cmdScreen.x, cmdScreen.y);
 		borderArea = BoundingBox(Vector2(0, 0), Vector2(squareWidth, 0), Vector2(0, squareWidth), Vector2(squareWidth, squareWidth));
 		mapArea = borderArea;
@@ -173,6 +185,8 @@ private:
 				}
 			}
 		}
+
+		abilityTimer.Restart();
 		InstantiateBullet(assetManager.blocks[2], Vector2(200, 500));
 
 	}
@@ -275,6 +289,8 @@ public:
 
 		bullets = list<Bullet>();
 		blocks = list<Block>();
+
+		abilityTimer = Timer();
 	}
 };
 int main(int argc, char* argv[])
