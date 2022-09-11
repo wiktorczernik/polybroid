@@ -1,5 +1,4 @@
 #include "Objects.h"
-#include "Framework.h"
 #include "PolyMath.h"
 
 
@@ -53,21 +52,23 @@ BlockAsset::BlockAsset() {
 
 #pragma endregion
 
-
-void Bullet::Tick(list<GameObject> &objects) {
+void PhysicsObject::Tick() {
 	Move(currentVelocity.x, currentVelocity.y);
 	bool border[2];
 	if (CollidesBorder(border)) {
 		InvertVelocity(border[0], border[1]);
 	}
-	for (auto& object : objects) {
+}
+void Bullet::Tick(list<GameObject> &objects) {
+	PhysicsObject::Tick();
+	for (GameObject& object : objects) {
 		if (CollidesWith(object)) {
-			std::cout << currentVelocity.y;
+			/*static_cast<Block>(object)
+			if (dynamic_cast<Block&>(object) != nullptr)*/
 			InvertVelocity(true, false);
 			Move(currentVelocity.x, currentVelocity.y);
 		}
 		if (CollidesWith(object)) {
-			std::cout << currentVelocity.y;
 			InvertVelocity(false, true);
 		}
 	}

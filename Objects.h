@@ -103,7 +103,7 @@ public:
 		currentVelocity.x *= (X == true ? -1 : 1);
 		currentVelocity.y *= (Y == true ? -1 : 1);
 	}
-	virtual void Tick(list<GameObject> &objects) = 0;
+	void Tick();
 };
 #pragma endregion
 

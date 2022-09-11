@@ -11,6 +11,7 @@ private:
 	list<Block> blocks;
 	list<Bullet> bullets;
 	BoundingBox borders;
+	list<GameObject> toDraw;
 public:
 	Map();
 	Map(BoundingBox borders);

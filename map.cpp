@@ -4,7 +4,9 @@
 
 Map::Map()
 {
-
+	blocks = list<Block>();
+	bullets = list<Bullet>();
+	toDraw = list<GameObject>();
 };
 
 void Map::Spawn() {
@@ -15,5 +17,6 @@ void Map::Tick() {
 
 }
 list<GameObject>& Map::ObjectsToDraw() {
-	return list<GameObject>();
+	toDraw.clear();
+	return toDraw;
 }
