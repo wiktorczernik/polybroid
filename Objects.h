@@ -9,6 +9,19 @@
 namespace fs = std::filesystem;
 using namespace std;
 
+class Timer {
+private:
+	bool* trigger;
+	unsigned int currentTime;
+	unsigned int triggerTime;
+public:
+	bool autoRestart;
+	Timer();
+	void Setup(bool* Trigger, unsigned int TriggerTime, bool AutoRestart);
+	void Tick(int deltaTime);
+	void Restart();
+};
+
 #pragma region Objects
 class Object {
 public:
@@ -149,7 +162,7 @@ public:
 		idleSprite = Sprite;
 		currentSprite = idleSprite;
 	}
-	void Tick(list<GameObject> &objects);
+	void Tick(list<Block> &objects);
 };
 class Player : public PhysicsObject {
 public:

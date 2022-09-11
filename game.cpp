@@ -34,8 +34,34 @@ private:
 
 	unsigned int score;
 	int mapIndex;
+	int blocksToDestroy;
 
+	int deltaTime;
+	clock_t previousTickTime;
+	clock_t currentTickTime;
 
+	void GameTick() {
+		std::list<Block>::iterator i = blocks.begin();
+
+		list<Block>::const_iterator itr = blocks.cbegin();
+		while (itr != blocks.cend())
+		{
+			list<Block>::const_iterator curr = itr++;
+			if (curr->IsAlive == false) {
+				score += 150 * (mapArea.MaxY() / curr->position.y);
+				blocksToDestroy--;
+
+				cout << '\n' << "Current score is: " << score << '\n' << "Blocks to destroy: " << blocksToDestroy << "\n\n";
+
+				blocks.erase(curr);
+				if (blocksToDestroy <= 0) {
+					NextMap();
+				}
+			}
+		}
+
+		bullets.front().Tick(blocks);
+	}
 
 #pragma region Drawing
 	Sprite* GetSprite(fs::path Path) {
@@ -54,6 +80,10 @@ private:
 		drawTestBackground();
 
 		for each (Block var in blocks)
+		{
+			DrawGameObject(var);
+		}
+		for each (Bullet var in bullets)
 		{
 			DrawGameObject(var);
 		}
@@ -107,6 +137,10 @@ private:
 #pragma endregion
 
 	void SetupVariables() {
+		score = 0;
+		blocksToDestroy = 0;
+		mapIndex = -1;
+
 		int squareWidth = std::min(cmdScreen.x, cmdScreen.y);
 		borderArea = BoundingBox(Vector2(0, 0), Vector2(squareWidth, 0), Vector2(0, squareWidth), Vector2(squareWidth, squareWidth));
 		mapArea = borderArea;
@@ -118,8 +152,6 @@ private:
 		
 		mapArea.a.y = mapArea.a.x;
 		mapArea.b.y = mapArea.a.y;
-
-		cout << mapArea.MaxY();
 
 		blockSize = Vector2((mapArea.MaxX()-mapArea.MinX()) / 8, (mapArea.MaxY() - mapArea.MinX()) / 16);
 	}
@@ -133,10 +165,15 @@ private:
 			for (int y = 0; y < 8; y++) {
 				value = map.terrain[x][y];
 				if (value != 0) {
-					InstantiateBlock(assetManager.blocks[value - 1], y, x);
+					BlockAsset& asset = assetManager.blocks[value - 1];
+					if (asset.health < 100) {
+						blocksToDestroy++;
+					}
+					InstantiateBlock(asset, y, x);
 				}
 			}
 		}
+		InstantiateBullet(assetManager.blocks[2], Vector2(200, 500));
 
 	}
 	void DestroyMap() {
@@ -155,6 +192,11 @@ private:
 		Sprite* brokenSprite = GetSprite(asset.brokenSprite);
 		Block block = Block(position, blockSize, idleSprite, brokenSprite, asset.id, asset.health);
 		blocks.push_front(block);
+	}
+	void InstantiateBullet(GameObjectAsset& asset, Vector2 Position) {
+		Sprite* idleSprite = GetSprite(asset.idleSprite);
+		Bullet bullet = Bullet(mapArea, Position, Vector2(30, 30), Vector2(2, -2), idleSprite);
+		bullets.push_front(bullet);
 	}
 
 public:
@@ -176,6 +218,7 @@ public:
 
 		int i = 0;
 		NextMap();
+		previousTickTime = clock();
 		return true;
 	}
 
@@ -184,7 +227,12 @@ public:
 	}
 
 	virtual bool Tick() {
+		currentTickTime = clock();
+		deltaTime = (int)(currentTickTime - previousTickTime);
+		GameTick();
 		Draw();
+		
+		previousTickTime = currentTickTime;
 		return false;
 	}
 	virtual void onMouseMove(int x, int y, int xrelative, int yrelative) {
@@ -223,9 +271,6 @@ public:
 		return "Polybroid";
 	}
 	Game() {
-		score = 0;
-		mapIndex = -1;
-
 		assetManager = AssetManager();
 
 		bullets = list<Bullet>();

@@ -1,6 +1,33 @@
 #include "Objects.h"
 #include "PolyMath.h"
 
+
+Timer::Timer() {
+	currentTime = 0;
+	triggerTime = 10000;
+}
+void Timer::Setup(bool* Trigger, unsigned int TriggerTime, bool AutoRestart) {
+	trigger = Trigger;
+	triggerTime = TriggerTime;
+	autoRestart = AutoRestart;
+}
+
+void Timer::Tick(int deltaTime) {
+	if (autoRestart && *trigger == true) {
+		currentTime -= triggerTime;
+		*trigger = false;
+	}
+	currentTime += deltaTime;
+	if (currentTime >= triggerTime) {
+		*trigger = true;
+		if (!autoRestart) {
+			currentTime = triggerTime;
+		}
+	}
+}
+void Timer::Restart() {
+
+}
 void Object::Scale(int x, int y) {
 	scale.x += x;
 	scale.y += y;
@@ -47,8 +74,10 @@ bool GameObject::Hurt() {
 	health--;
 	if (health == 0)
 	{
+		IsAlive = false;
 		return true;
 	}
+	IsAlive = true;
 	return false;
 }
 
@@ -62,24 +91,25 @@ bool Block::Hurt() {
 }
 #pragma endregion
 
-void PhysicsObject::Tick() {
-	Move(currentVelocity.x, currentVelocity.y);
+void Bullet::Tick(list<Block>& blocks) {
+	Move(0, currentVelocity.y);
+	for (GameObject& object : blocks) {
+		if (CollidesWith(object)) {
+			InvertVelocity(false, true);
+			Move(0, currentVelocity.y);
+			object.Hurt();
+		}
+	}
+	Move(currentVelocity.x, 0);
+	for (GameObject& object : blocks) {
+		if (CollidesWith(object)) {
+			InvertVelocity(true, false);
+			Move(currentVelocity.x, 0);
+			object.Hurt();
+		}
+	}
 	bool border[2];
 	if (CollidesBorder(border)) {
 		InvertVelocity(border[0], border[1]);
-	}
-}
-void Bullet::Tick(list<GameObject>& objects) {
-	PhysicsObject::Tick();
-	for (GameObject& object : objects) {
-		if (CollidesWith(object)) {
-			/*static_cast<Block>(object)
-			if (dynamic_cast<Block&>(object) != nullptr)*/
-			InvertVelocity(true, false);
-			Move(currentVelocity.x, currentVelocity.y);
-		}
-		if (CollidesWith(object)) {
-			InvertVelocity(false, true);
-		}
 	}
 }
