@@ -69,7 +69,7 @@ void PhysicsObject::Tick() {
 		InvertVelocity(border[0], border[1]);
 	}
 }
-void Bullet::Tick(list<GameObject> &objects) {
+void Bullet::Tick(list<GameObject>& objects) {
 	PhysicsObject::Tick();
 	for (GameObject& object : objects) {
 		if (CollidesWith(object)) {

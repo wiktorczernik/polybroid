@@ -14,75 +14,107 @@ class Game : public Framework {
 private:
 	AssetManager assetManager;
 
+	Player player;
+
+	//list<Map> maps;
 	list<Bullet> bullets;
 	list<Block> blocks;
 
-	list<GameObject> objects;
 	BoundingBox borderArea;
 	BoundingBox playableArea;
 
-	Sprite* borderSprite;
-	Sprite* farlandsSprite;
-	Sprite* logoSprite;
+	VisualObject border;
+	VisualObject farlands;
+	VisualObject logo;
 
 	Vector2 farlandsPos;
 	Vector2 logoPos;
 
 	unsigned int score;
-	unsigned int levelIndex;
+	int mapIndex;
 
-	void InitMap() {
 
+	Sprite* GetSprite(fs::path Path) {
+		return createSprite(Path.string().c_str());
 	}
-	void NextMap() {
-
+	void DrawVisualObject(VisualObject& object) {
+		setSpriteSize(object.sprite, object.scale.x, object.scale.y);
+		drawSprite(object.sprite, object.position.x, object.position.y);
 	}
-
+	void DrawGameObject(GameObject& object) {
+		setSpriteSize(object.currentSprite, object.scale.x, object.scale.y);
+		drawSprite(object.currentSprite, object.position.x, object.position.y);
+	}
 
 	void Draw() {
+		drawTestBackground();
 		DrawOverlay();
 	}
+#pragma region Overlay
+
 	void SetupOverlay() {
 		int squareWidth = std::min(cmdScreen.x, cmdScreen.y);
 		borderArea = BoundingBox(Vector2(0, 0), Vector2(squareWidth, 0), Vector2(0, squareWidth), Vector2(squareWidth, squareWidth));
 		playableArea = borderArea;
 
-		borderSprite = GetSprite(assetManager.border.sprite);
-		if (cmdScreen.x != cmdScreen.y) {
-			logoSprite = GetSprite(assetManager.logo.sprite);
-			farlandsSprite = GetSprite(assetManager.farlands.sprite);
+		border = VisualObject();
+		border.sprite = GetSprite(assetManager.border.sprite);
 
-			int farlandsScale = 0;
-			int logoScale = 0;
+		if (cmdScreen.x != cmdScreen.y) {
+			logo = VisualObject();
+			farlands = VisualObject();
+
+			logo.sprite = GetSprite(assetManager.logo.sprite);
+			farlands.sprite = GetSprite(assetManager.farlands.sprite);
+
+			int farlandsScale = 1;
+			int logoScale = 10;
 
 			switch (cmdScreen.x > cmdScreen.y) {
 			case true:
 				farlandsScale = std::min(cmdScreen.x, cmdScreen.y);
 				logoScale = cmdScreen.x - borderArea.MaxX();
-				farlandsPos = Vector2(borderArea.b.x, borderArea.b.y);
-				logoPos = Vector2(borderArea.MaxX(), borderArea.MaxY()*0.5 - (logoScale * 0.5));
+				farlands.SetPosition(borderArea.b.x, borderArea.b.y);
+				logo.SetPosition(borderArea.MaxX(), borderArea.MaxY() * 0.5 - (logoScale * 0.5));
 				break;
 			case false:
 				farlandsScale = std::max(cmdScreen.x, cmdScreen.y);
 				logoScale = cmdScreen.y - borderArea.MaxY();
-				farlandsPos = Vector2(borderArea.c.x, borderArea.c.y);
-				logoPos = Vector2(borderArea.MaxX()*0.5 - (logoScale * 0.5), borderArea.MaxY());
+				farlands.SetPosition(borderArea.c.x, borderArea.c.y);
+				logo.SetPosition(borderArea.MaxX() * 0.5 - (logoScale * 0.5), borderArea.MaxY());
 				break;
 			}
-			setSpriteSize(logoSprite, logoScale, logoScale);
-			setSpriteSize(farlandsSprite, farlandsScale, farlandsScale);
+			logo.SetScale(logoScale, logoScale);
+			farlands.SetScale(farlandsScale, farlandsScale);
 		}
 
-
-		setSpriteSize(borderSprite, borderArea.MaxX(), borderArea.MaxY());
+		border.SetScale(borderArea.MaxX(), borderArea.MaxY());
 	}
 	void DrawOverlay() {
-		if (farlandsSprite) {
-			drawSprite(farlandsSprite, farlandsPos.x, farlandsPos.y);
-			drawSprite(logoSprite, logoPos.x, logoPos.y);
+		if (farlands.sprite != nullptr) {
+			DrawVisualObject(farlands);
+			DrawVisualObject(logo);
 		}
-		drawSprite(borderSprite, borderArea.MinX(), borderArea.MinY());
+		DrawVisualObject(border);
 	}
+#pragma endregion
+
+#pragma region Map
+	void InstantiateMap(int& index) {
+		bullets.clear();
+		blocks.clear();
+	}
+	void DestroyMap() {
+
+	}
+	void NextMap() {
+		DestroyMap();
+		mapIndex++;
+		InstantiateMap(mapIndex);
+	}
+#pragma endregion
+
+
 public:
 	Vector2 cmdScreen;
 
@@ -102,16 +134,11 @@ public:
 		return true;
 	}
 
-	Sprite* GetSprite(fs::path Path) {
-		return createSprite(Path.string().c_str());
-	}
-
 	virtual void Close() {
 
 	}
 
 	virtual bool Tick() {
-        drawTestBackground();
 		Draw();
 		return false;
 	}
@@ -124,6 +151,7 @@ public:
 	}
 
 	virtual void onKeyPressed(FRKey k) {
+		
 	}
 
 	virtual void onKeyReleased(FRKey k) {
@@ -135,7 +163,7 @@ public:
 	}
 	Game() {
 		score = 0;
-		levelIndex = -1;
+		mapIndex = -1;
 
 		assetManager = AssetManager();
 

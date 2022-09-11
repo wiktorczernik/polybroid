@@ -139,7 +139,7 @@ public:
 		IsAlive = true;
 		health = -1;
 	}
-	Bullet(BoundingBox Canvas, Vector2 Position, Vector2 Scale, Vector2 Velocity, Sprite* Sprite) {
+	Bullet(BoundingBox Canvas, Vector2 Position, Vector2 Scale, Vector2 Velocity, Sprite* Sprite) : PhysicsObject(Canvas, Position, Scale, Velocity, Sprite) {
 		IsAlive = true;
 		health = -1;
 		canvas = Canvas;
@@ -150,4 +150,20 @@ public:
 		currentSprite = idleSprite;
 	}
 	void Tick(list<GameObject> &objects);
+};
+class Player : public PhysicsObject {
+public:
+	Player() : PhysicsObject() {
+
+	}
+	Player(BoundingBox Canvas, Vector2 Position, Vector2 Scale, Vector2 Velocity, Sprite* IdleSprite) : PhysicsObject(Canvas, Position, Scale, Velocity, IdleSprite) {
+		IsAlive = true;
+		health = -1;
+		canvas = Canvas;
+		position = Position;
+		scale = Scale;
+		currentVelocity = Velocity;
+		idleSprite = IdleSprite;
+		currentSprite = idleSprite;
+	}
 };
