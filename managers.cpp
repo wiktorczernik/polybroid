@@ -93,6 +93,7 @@ BlockAsset AssetManager::GetBlockAsset(fs::path path) {
 		return result;
 	}
 	catch(std::exception& e) {
+		result.id = 1;
 		cout << "Can't read file: " << e.what();
 		return result;
 	}
@@ -100,10 +101,16 @@ BlockAsset AssetManager::GetBlockAsset(fs::path path) {
 void AssetManager::GetBlockAssets(BlockAsset* result) {
 	fs::path paths[3];
 	GetAssetPathsByType(paths, AssetBlock, 3);
+	int index = 0;
 	for each (fs::path path in paths)
 	{
 		BlockAsset block = GetBlockAsset(path);
-		result[block.id] = block;
+		index = block.id - 1;
+		if (index >= sizeof(result)) {
+			std::cout << "CONTINUE" << '\n';
+			continue;
+		}
+		result[index] = block;
 	}
 }
 void AssetManager::Setup() {

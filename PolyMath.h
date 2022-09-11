@@ -1,4 +1,5 @@
 #pragma once
+#include <iostream>
 struct Vector2 {
 	int x;
 	int y;
@@ -27,5 +28,29 @@ struct BoundingBox {
 		b = B;
 		c = C;
 		d = D;
+	}
+	int MinX() {
+		return std::min(a.x, c.x);
+	}
+	int MaxX() {
+		return std::max(b.x, d.x);
+	}
+	int MinY() {
+		return std::min(a.y, b.y);
+	}
+	int MaxY() {
+		return std::max(c.y, d.y);
+	}
+	bool Intersects(BoundingBox bounds) {
+		std::cout << MinX() << " <= " << bounds.MaxX() << " = " << (MinX() <= bounds.MaxX()) << '\n';
+		std::cout << MaxX() << " >= " << bounds.MinX() << " = " << (MaxX() >= bounds.MinX()) << '\n';
+		std::cout << MinY() << " <= " << bounds.MaxY() << " = " << (MinY() <= bounds.MaxY()) << '\n';
+		std::cout << MaxY() << " >= " << bounds.MinY() << " = " << (MaxY() >= bounds.MinY()) << "\n\n\n";
+		return (
+			MinX() <= bounds.MaxX() &&
+			MaxX() >= bounds.MinX() &&
+			MinY() <= bounds.MaxY() &&
+			MaxY() >= bounds.MinY()
+			);
 	}
 };

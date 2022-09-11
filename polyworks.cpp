@@ -14,20 +14,27 @@ class Polyworks : public Framework {
 private:
 	Sprite* blueBlock;
 	AssetManager assetManager;
-	BlockAsset blockAsset;
+	Bullet bullet;
+	GameObject object;
+	BoundingBox canvas;
 public:
-	Vector2 targetScreenSize;
+	Vector2 cmdScreen;
 	virtual void PreInit(int& width, int& height, bool& fullscreen)
 	{
-		width = targetScreenSize.x;
-		height = targetScreenSize.y;
+		width = cmdScreen.x;
+		height = cmdScreen.y;
 		fullscreen = false;
-		assetManager = AssetManager();
 	}
 
 	virtual bool Init() {
 		assetManager.Setup();
-		blueBlock = createSprite(assetManager.blocks[2].idleSprite.string().c_str());
+		int size = std::min(cmdScreen.x, cmdScreen.y);
+		canvas = BoundingBox(Vector2(0, 0), Vector2(size, 0), Vector2(0, size), Vector2(size, size));
+		Sprite* sprite = createSprite(assetManager.blocks[0].idleSprite.string().c_str());
+		Sprite* spriteTwo = createSprite(assetManager.blocks[1].idleSprite.string().c_str());
+		bullet = Bullet(Vector2(250, 350), Vector2(50, 50), Vector2(3, -3), sprite);
+		object = GameObject(Vector2(330, 300), Vector2(120, 50), spriteTwo);
+
 		return true;
 	}
 
@@ -37,8 +44,28 @@ public:
 
 	virtual bool Tick() {
         drawTestBackground();
-		setSpriteSize(blueBlock, 50, 50);
-		drawSprite(blueBlock, 50, 50);
+		//std::cout << clock() << '\n';
+		//bullet.Tick();
+
+		bool invert[2];
+
+
+		bullet.Move(bullet.currentVelocity.x, bullet.currentVelocity.y);
+		bullet.CollidesBorder(canvas);
+		if (bullet.CollidesWith(object)) {
+			std::cout << bullet.currentVelocity.y;
+			bullet.InvertVelocity(true, false);
+			bullet.Move(bullet.currentVelocity.x, bullet.currentVelocity.y);
+		}
+		if (bullet.CollidesWith(object)) {
+			std::cout << bullet.currentVelocity.y;
+			bullet.InvertVelocity(false, true);
+		}
+
+		setSpriteSize(bullet.currentSprite, bullet.scale.x, bullet.scale.y);
+		drawSprite(bullet.currentSprite, bullet.position.x, bullet.position.y);
+		setSpriteSize(object.currentSprite, object.scale.x, object.scale.y);
+		drawSprite(object.currentSprite, object.position.x, object.position.y);
 
 		return false;
 	}
@@ -92,7 +119,7 @@ int main(int argc, char* argv[])
 
 	}
 
-	framework->targetScreenSize = screenSize;
+	framework->cmdScreen = screenSize;
 
 	return run(framework);
 }

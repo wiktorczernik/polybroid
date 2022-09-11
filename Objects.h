@@ -42,6 +42,9 @@ public:
 	Vector2 scale;
 	Vector2 position;
 	BoundingBox boundingBox;
+	GameObject() {
+
+	}
 	GameObject(Vector2 Position, Vector2 Scale, Sprite* IdleSprite) {
 		idleSprite = IdleSprite;
 		currentSprite = idleSprite;
@@ -62,7 +65,10 @@ private:
 	int health;
 	Sprite* brokenSprite;
 public:
-	void Hurt();
+	bool Hurt();
+	Block() {
+
+	}
 	Block(Vector2 Position, Vector2 Scale, Sprite* IdleSprite, Sprite* BrokenSprite, int Id, int Health) : GameObject(Position, Scale, IdleSprite) {
 		brokenSprite = BrokenSprite;
 		id = Id;
@@ -70,8 +76,47 @@ public:
 	}
 };
 class PhysicsObject : public GameObject {
-	Vector2 currentVelocity;
+protected:
+	BoundingBox canvas;
 public:
-	virtual void Tick();
+	Vector2 currentVelocity;
+	bool CollidesBorder(BoundingBox borders) {
+		bool result = false;
+		if (boundingBox.a.x <= borders.a.x || boundingBox.b.x >= borders.b.x) {
+			InvertVelocity(true, false);
+			result = true;
+		}
+		if (boundingBox.a.y <= borders.b.y || boundingBox.c.y >= borders.d.y) {
+			InvertVelocity(false, true);
+			result = true;
+		}
+		return result;
+	}
+	bool CollidesWith(GameObject otherObject) {
+		BoundingBox a = boundingBox;
+		BoundingBox b = otherObject.boundingBox;
+
+		return a.Intersects(b);
+	}
+	void InvertVelocity(bool X, bool Y) {
+		currentVelocity.x *= (X == true ? -1 : 1);
+		currentVelocity.y *= (Y == true ? -1 : 1);
+	}
+	void Tick();
 };
 #pragma endregion
+
+class Bullet : public PhysicsObject {
+public:
+	Bullet() {
+
+	}
+	Bullet(Vector2 Position, Vector2 Scale, Vector2 Velocity, Sprite* Sprite) {
+		position = Position;
+		scale = Scale;
+		currentVelocity = Velocity;
+		idleSprite = Sprite;
+		currentSprite = idleSprite;
+	}
+	void Tick();
+};

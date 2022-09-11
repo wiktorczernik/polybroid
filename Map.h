@@ -1,13 +1,15 @@
 #pragma once
 #include "Objects.h"
-/*
+#include "Framework.h"
+
 class Map {
 private:
-	GameObject objects;
-	PhysicsObject physObjects;
+	Vector2 size;
+	Block blocks[576];
+	BoundingBox borders;
 public:
 	Map();
-	void Draw();
+	Map(BoundingBox borders);
+	void Spawn();
 	void PhysTick();
-	Sprite* GetSpriteByPath(std::string path);
-};*/
+};

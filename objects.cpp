@@ -6,8 +6,8 @@
 #pragma region GameObject 
 void GameObject::UpdateBoundingBox() {
 	boundingBox.a = position;
-	boundingBox.b = Vector2(position.x + scale.x, position.y);
-	boundingBox.c = Vector2(position.x, position.y + scale.y);
+	boundingBox.b = Vector2(boundingBox.a.x + scale.x, boundingBox.a.y);
+	boundingBox.c = Vector2(boundingBox.a.x, boundingBox.a.y + scale.y);
 	boundingBox.d = Vector2(boundingBox.b.x, boundingBox.c.y);
 }
 void GameObject::Scale(int x, int y) {
@@ -37,19 +37,21 @@ bool GameObject::IsColliding(GameObject otherObject) {
 #pragma endregion
 
 #pragma region Block
-void Block::Hurt() {
-
+bool Block::Hurt() {
+	health--;
+	currentSprite = brokenSprite;
+	if (health <= 0)
+	{
+		return true;
+	}
+	return false;
 }
 BlockAsset::BlockAsset() {
-	id = -1;
+	id = 1;
 	health = 0;
 }
 
 #pragma endregion
 
-
-#pragma region PhysicsObject
-void PhysicsObject::Tick() {
-
+void Bullet::Tick() {
 }
-#pragma endregion
