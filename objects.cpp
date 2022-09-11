@@ -96,7 +96,7 @@ bool Block::Hurt() {
 
 void Bullet::Tick(list<Block>& blocks) {
 	Move(0, currentVelocity.y);
-	for (GameObject& object : blocks) {
+	for (Block& object : blocks) {
 		if (CollidesWith(object)) {
 			InvertVelocity(false, true);
 			Move(0, currentVelocity.y);
@@ -104,7 +104,7 @@ void Bullet::Tick(list<Block>& blocks) {
 		}
 	}
 	Move(currentVelocity.x, 0);
-	for (GameObject& object : blocks) {
+	for (Block& object : blocks) {
 		if (CollidesWith(object)) {
 			InvertVelocity(true, false);
 			Move(currentVelocity.x, 0);
@@ -115,4 +115,22 @@ void Bullet::Tick(list<Block>& blocks) {
 	if (CollidesBorder(border)) {
 		InvertVelocity(border[0], border[1]);
 	}
+}
+
+void Ability::Tick() {
+
+	/*if (CollidesWith(player)) {
+		IsAlive = false;
+	}*/
+	cout << "Ability ticks" << '\n';
+
+	bool border[2];
+	if (CollidesBorder(border)) {
+		if (border[1] == true && position.y > canvas.MaxY()/2) {
+			cout << "Ability is dead!" << '\n';
+			IsAlive = false;
+		}
+		InvertVelocity(border[0], border[1]);
+	}
+	Move(currentVelocity.x, currentVelocity.y);
 }

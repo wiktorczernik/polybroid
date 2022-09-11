@@ -180,3 +180,28 @@ public:
 		currentSprite = idleSprite;
 	}
 };
+class Ability : public PhysicsObject {
+public:
+	bool isPositive;
+	Ability() : PhysicsObject() {
+		IsAlive = true;
+		health = -1;
+	}
+	Ability(BoundingBox Canvas, Vector2 Position, Vector2 Scale, Vector2 Velocity, bool IsPositive, Sprite* Sprite) : PhysicsObject(Canvas, Position, Scale, Velocity, Sprite) {
+		IsAlive = true;
+		health = -1;
+		canvas = Canvas;
+
+		canvas.a.y -= Scale.y * 4;
+		canvas.b.y = canvas.a.y;
+		canvas.c.y += Scale.y * 4;
+		canvas.d.y = canvas.c.y;
+
+		position = Position;
+		scale = Scale;
+		currentVelocity = Velocity;
+		isPositive = IsPositive;
+
+	}
+	void Tick();
+};

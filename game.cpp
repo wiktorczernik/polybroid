@@ -20,6 +20,8 @@ private:
 	list<Bullet> bullets;
 	list<Block> blocks;
 
+	Ability currentAbility;
+
 	BoundingBox borderArea;
 	BoundingBox mapArea;
 
@@ -28,6 +30,7 @@ private:
 	VisualObject logo;
 
 	Vector2 blockSize;
+	Vector2 abilitySize;
 
 	float abilitySpawnDelay;
 	float abilitySpawnCooldown;
@@ -48,8 +51,15 @@ private:
 		abilityTimer.Tick(deltaTime);
 
 		if (canAbilitySpawn) {
+			//InstantiateAbility();
 			cout << "\n\n" << "ABILITY CAN SPAWN" << "\n\n";
 		}
+		Ability* currentAb = &currentAbility;
+		if (currentAbility.currentSprite != nullptr) {
+			//currentAbility.Tick();
+		}
+
+		bullets.front().Tick(blocks);
 
 		std::list<Block>::iterator i = blocks.begin();
 
@@ -61,7 +71,7 @@ private:
 				score += 150 * (mapArea.MaxY() / curr->position.y);
 				blocksToDestroy--;
 
-				cout << '\n' << "Current score is: " << score << '\n' << "Blocks to destroy: " << blocksToDestroy << "\n\n";
+				//cout << '\n' << "Current score is: " << score << '\n' << "Blocks to destroy: " << blocksToDestroy << "\n\n";
 
 				blocks.erase(curr);
 				if (blocksToDestroy <= 0) {
@@ -70,7 +80,6 @@ private:
 			}
 		}
 
-		bullets.front().Tick(blocks);
 	}
 
 #pragma region Drawing
@@ -82,6 +91,9 @@ private:
 		drawSprite(object.sprite, object.position.x, object.position.y);
 	}
 	void DrawGameObject(GameObject& object) {
+		if (object.currentSprite == nullptr) {
+			return;
+		}
 		setSpriteSize(object.currentSprite, object.scale.x, object.scale.y);
 		drawSprite(object.currentSprite, object.position.x, object.position.y);
 	}
@@ -93,6 +105,7 @@ private:
 		{
 			DrawGameObject(var);
 		}
+		DrawGameObject(currentAbility);
 		for each (Bullet var in bullets)
 		{
 			DrawGameObject(var);
@@ -151,7 +164,7 @@ private:
 		blocksToDestroy = 0;
 		mapIndex = -1;
 
-		abilityTimer.Setup(&canAbilitySpawn, 10000, true);
+		abilityTimer.Setup(&canAbilitySpawn, 3000, true);
 
 		int squareWidth = std::min(cmdScreen.x, cmdScreen.y);
 		borderArea = BoundingBox(Vector2(0, 0), Vector2(squareWidth, 0), Vector2(0, squareWidth), Vector2(squareWidth, squareWidth));
@@ -166,6 +179,7 @@ private:
 		mapArea.b.y = mapArea.a.y;
 
 		blockSize = Vector2((mapArea.MaxX()-mapArea.MinX()) / 8, (mapArea.MaxY() - mapArea.MinX()) / 16);
+		abilitySize = Vector2(blockSize.x, blockSize.x);
 	}
 
 #pragma region Map
@@ -211,6 +225,14 @@ private:
 		Sprite* idleSprite = GetSprite(asset.idleSprite);
 		Bullet bullet = Bullet(mapArea, Position, Vector2(30, 30), Vector2(2, -2), idleSprite);
 		bullets.push_front(bullet);
+	}
+	void InstantiateAbility() {
+		GameObjectAsset& asset = assetManager.blocks[0];
+		Vector2 position = Vector2(mapArea.MaxX()/2 - abilitySize.x/2, mapArea.MinY()-abilitySize.y);
+
+		Sprite* Sprite = GetSprite(asset.idleSprite);
+		Ability ability = Ability(mapArea, position, abilitySize, Vector2(2, 2), true, Sprite);
+		currentAbility = ability;
 	}
 
 public:

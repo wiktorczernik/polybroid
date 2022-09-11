@@ -58,6 +58,7 @@ public:
 	VisualAsset farlands;
 	VisualAsset logo;
 
+	GameObjectAsset abilities[2];
 	BlockAsset blocks[3];
 	MapAsset maps[3];
 
