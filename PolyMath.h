@@ -42,15 +42,12 @@ struct BoundingBox {
 		return std::max(c.y, d.y);
 	}
 	bool Intersects(BoundingBox bounds) {
-		std::cout << MinX() << " <= " << bounds.MaxX() << " = " << (MinX() <= bounds.MaxX()) << '\n';
-		std::cout << MaxX() << " >= " << bounds.MinX() << " = " << (MaxX() >= bounds.MinX()) << '\n';
-		std::cout << MinY() << " <= " << bounds.MaxY() << " = " << (MinY() <= bounds.MaxY()) << '\n';
-		std::cout << MaxY() << " >= " << bounds.MinY() << " = " << (MaxY() >= bounds.MinY()) << "\n\n\n";
-		return (
+		return 
+		(
 			MinX() <= bounds.MaxX() &&
 			MaxX() >= bounds.MinX() &&
 			MinY() <= bounds.MaxY() &&
 			MaxY() >= bounds.MinY()
-			);
+		);
 	}
 };

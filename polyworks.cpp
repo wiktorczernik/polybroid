@@ -32,7 +32,7 @@ public:
 		canvas = BoundingBox(Vector2(0, 0), Vector2(size, 0), Vector2(0, size), Vector2(size, size));
 		Sprite* sprite = createSprite(assetManager.blocks[0].idleSprite.string().c_str());
 		Sprite* spriteTwo = createSprite(assetManager.blocks[1].idleSprite.string().c_str());
-		bullet = Bullet(Vector2(250, 350), Vector2(50, 50), Vector2(3, -3), sprite);
+		bullet = Bullet(canvas, Vector2(250, 350), Vector2(50, 50), Vector2(3, -3), sprite);
 		object = GameObject(Vector2(330, 300), Vector2(120, 50), spriteTwo);
 
 		return true;
@@ -49,9 +49,7 @@ public:
 
 		bool invert[2];
 
-
-		bullet.Move(bullet.currentVelocity.x, bullet.currentVelocity.y);
-		bullet.CollidesBorder(canvas);
+		bullet.Tick();
 		if (bullet.CollidesWith(object)) {
 			std::cout << bullet.currentVelocity.y;
 			bullet.InvertVelocity(true, false);

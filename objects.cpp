@@ -54,4 +54,9 @@ BlockAsset::BlockAsset() {
 #pragma endregion
 
 void Bullet::Tick() {
+	Move(currentVelocity.x, currentVelocity.y);
+	bool border[2];
+	if (CollidesBorder(border)) {
+		InvertVelocity(border[0], border[1]);
+	}
 }

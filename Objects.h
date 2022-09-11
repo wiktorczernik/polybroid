@@ -80,17 +80,17 @@ protected:
 	BoundingBox canvas;
 public:
 	Vector2 currentVelocity;
-	bool CollidesBorder(BoundingBox borders) {
-		bool result = false;
-		if (boundingBox.a.x <= borders.a.x || boundingBox.b.x >= borders.b.x) {
-			InvertVelocity(true, false);
-			result = true;
+	bool CollidesBorder(bool* result) {
+		bool answer = false;
+		if (boundingBox.a.x <= canvas.a.x || boundingBox.b.x >= canvas.b.x) {
+			result[0] = true;
+			answer = true;
 		}
-		if (boundingBox.a.y <= borders.b.y || boundingBox.c.y >= borders.d.y) {
-			InvertVelocity(false, true);
-			result = true;
+		if (boundingBox.a.y <= canvas.b.y || boundingBox.c.y >= canvas.d.y) {
+			result[1] = true;
+			answer = true;
 		}
-		return result;
+		return answer;
 	}
 	bool CollidesWith(GameObject otherObject) {
 		BoundingBox a = boundingBox;
@@ -111,7 +111,8 @@ public:
 	Bullet() {
 
 	}
-	Bullet(Vector2 Position, Vector2 Scale, Vector2 Velocity, Sprite* Sprite) {
+	Bullet(BoundingBox Canvas, Vector2 Position, Vector2 Scale, Vector2 Velocity, Sprite* Sprite) {
+		canvas = Canvas;
 		position = Position;
 		scale = Scale;
 		currentVelocity = Velocity;
