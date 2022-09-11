@@ -21,19 +21,20 @@ private:
 	list<Block> blocks;
 
 	BoundingBox borderArea;
-	BoundingBox playableArea;
+	BoundingBox mapArea;
 
 	VisualObject border;
 	VisualObject farlands;
 	VisualObject logo;
 
-	Vector2 farlandsPos;
-	Vector2 logoPos;
+	Vector2 blockSize;
 
 	unsigned int score;
 	int mapIndex;
 
 
+
+#pragma region Drawing
 	Sprite* GetSprite(fs::path Path) {
 		return createSprite(Path.string().c_str());
 	}
@@ -48,15 +49,17 @@ private:
 
 	void Draw() {
 		drawTestBackground();
+
+		for each (Block var in blocks)
+		{
+			DrawGameObject(var);
+		}
 		DrawOverlay();
 	}
+
 #pragma region Overlay
 
 	void SetupOverlay() {
-		int squareWidth = std::min(cmdScreen.x, cmdScreen.y);
-		borderArea = BoundingBox(Vector2(0, 0), Vector2(squareWidth, 0), Vector2(0, squareWidth), Vector2(squareWidth, squareWidth));
-		playableArea = borderArea;
-
 		border = VisualObject();
 		border.sprite = GetSprite(assetManager.border.sprite);
 
@@ -98,11 +101,35 @@ private:
 		DrawVisualObject(border);
 	}
 #pragma endregion
+#pragma endregion
+
+	void SetupVariables() {
+		int squareWidth = std::min(cmdScreen.x, cmdScreen.y);
+		borderArea = BoundingBox(Vector2(0, 0), Vector2(squareWidth, 0), Vector2(0, squareWidth), Vector2(squareWidth, squareWidth));
+		mapArea = borderArea;
+		mapArea.b.x *= 0.955;
+		mapArea.d.x *= 0.955;
+		mapArea.a.x = borderArea.b.x - mapArea.b.x;
+		mapArea.a.y = mapArea.a.x;
+		mapArea.b.y = mapArea.a.y;
+		mapArea.c.x = mapArea.a.x;
+		blockSize = Vector2(mapArea.MaxX()/12, mapArea.MaxY()/22);
+	}
 
 #pragma region Map
 	void InstantiateMap(int& index) {
 		bullets.clear();
 		blocks.clear();
+		MapAsset& map = assetManager.maps[index];
+		int value = 0;
+		for (int x = 0; x < 48; x++) {
+			for (int y = 0; y < 12; y++) {
+				value = map.terrain[x][y];
+				if (value != 0) {
+					InstantiateBlock(assetManager.blocks[value - 1], y, x);
+				}
+			}
+		}
 	}
 	void DestroyMap() {
 
@@ -113,7 +140,13 @@ private:
 		InstantiateMap(mapIndex);
 	}
 #pragma endregion
-
+	void InstantiateBlock(BlockAsset& asset, int x, int y) {
+		Vector2 position = Vector2(mapArea.MinX() + x * blockSize.x, mapArea.MinY() + y * blockSize.y);
+		Sprite* idleSprite = GetSprite(asset.idleSprite);
+		Sprite* brokenSprite = GetSprite(asset.brokenSprite);
+		Block block = Block(position, blockSize, idleSprite, brokenSprite, asset.id, asset.health);
+		blocks.push_front(block);
+	}
 
 public:
 	Vector2 cmdScreen;
@@ -129,8 +162,11 @@ public:
 	virtual bool Init() {
 		assetManager.Setup();
 
+		SetupVariables();
 		SetupOverlay();
 
+		int i = 0;
+		InstantiateMap(i);
 		return true;
 	}
 

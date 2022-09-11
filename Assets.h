@@ -23,6 +23,8 @@ public:
 
 class MapAsset : Asset {
 public:
+	fs::path background;
+	int id;
 	int terrain[48][12];
 };
 class VisualAsset : public Asset {
@@ -57,12 +59,15 @@ public:
 	VisualAsset logo;
 
 	BlockAsset blocks[3];
+	MapAsset maps[3];
 
 	AssetManager();
 	void Setup();
 	void GetBlockAssets(BlockAsset* result);
+	void GetMapAssets(MapAsset* result);
 	VisualAsset GetVisualAsset(std::string name);
 	BlockAsset GetBlockAsset(fs::path path);
+	MapAsset GetMapAsset(fs::path path);
 	void ReadFile(std::string* result, fs::path filePath, int amount);
 	void GetAssetPathsByType(fs::path* result, AssetType type, int amount);
 	fs::path GetAssetPathByName(std::string name, AssetType type);

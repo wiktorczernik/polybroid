@@ -99,6 +99,30 @@ void AssetManager::ReadFile(std::string* result, fs::path filePath, int amount) 
 	}
 }
 
+MapAsset AssetManager::GetMapAsset(fs::path path) {
+	std::string lines[50];
+	MapAsset result = MapAsset();
+	try {
+		ReadFile(lines, path, 50);
+
+		result.id = std::stoi(lines[0]);
+		int value = 0;
+		for (int x = 2; x < 50; x++) {
+			for (int y = 0; y < 12; y++) {
+				value = std::stoi(string() + lines[x].at(y));
+				result.terrain[x - 2][y] = value;
+				cout << value;
+			}
+			cout << "\n";
+		}
+		cout << "\n\n\n";
+		return result;
+	}
+	catch (std::exception& e) {
+		cout << "Can't read file: " << e.what();
+		return result;
+	}
+}
 BlockAsset AssetManager::GetBlockAsset(fs::path path) {
 	std::string lines[4];
 	int id;
@@ -130,12 +154,12 @@ BlockAsset AssetManager::GetBlockAsset(fs::path path) {
 	}
 }
 VisualAsset AssetManager::GetVisualAsset(std::string name) {
-	std::string lines[1];
+	std::string lines[49];
 	fs::path path = GetAssetPathByName(name, AssetVisual);
 	fs::path sprite = path.parent_path();
 	VisualAsset result = VisualAsset();
 	try {
-		ReadFile(lines, path, 1);
+		ReadFile(lines, path, 49);
 
 		sprite += "\\" + lines[0];
 		result.path = path;
@@ -163,8 +187,24 @@ void AssetManager::GetBlockAssets(BlockAsset* result) {
 		result[index] = block;
 	}
 }
+void AssetManager::GetMapAssets(MapAsset* result) {
+	fs::path paths[3];
+	GetAssetPathsByType(paths, AssetMap, 3);
+	int index = 0;
+	for each (fs::path path in paths)
+	{
+		MapAsset block = GetMapAsset(path);
+		index = block.id - 1;
+		if (index >= sizeof(result)) {
+			std::cout << "CONTINUE" << '\n';
+			continue;
+		}
+		result[index] = block;
+	}
+}
 void AssetManager::Setup() {
 	GetBlockAssets(blocks);
+	GetMapAssets(maps);
 	border = GetVisualAsset("border");
 	farlands = GetVisualAsset("farlands");
 	logo = GetVisualAsset("logo");
