@@ -53,6 +53,7 @@ BlockAsset::BlockAsset() {
 
 #pragma endregion
 
+
 void Bullet::Tick(list<GameObject> &objects) {
 	Move(currentVelocity.x, currentVelocity.y);
 	bool border[2];

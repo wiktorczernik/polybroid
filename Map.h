@@ -1,15 +1,20 @@
 #pragma once
 #include "Objects.h"
 #include "Framework.h"
+#include <iostream>
+
+using namespace std;
 
 class Map {
 private:
 	Vector2 size;
-	Block blocks[576];
+	list<Block> blocks;
+	list<Bullet> bullets;
 	BoundingBox borders;
 public:
 	Map();
 	Map(BoundingBox borders);
 	void Spawn();
-	void PhysTick();
+	void Tick();
+	std::list<GameObject>& ObjectsToDraw();
 };

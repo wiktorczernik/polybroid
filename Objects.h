@@ -79,6 +79,7 @@ class PhysicsObject : public GameObject {
 protected:
 	BoundingBox canvas;
 public:
+	bool IsAlive;
 	Vector2 currentVelocity;
 	bool CollidesBorder(bool* result) {
 		bool answer = false;
@@ -102,7 +103,7 @@ public:
 		currentVelocity.x *= (X == true ? -1 : 1);
 		currentVelocity.y *= (Y == true ? -1 : 1);
 	}
-	void Tick();
+	virtual void Tick(list<GameObject> &objects) = 0;
 };
 #pragma endregion
 
@@ -112,6 +113,7 @@ public:
 
 	}
 	Bullet(BoundingBox Canvas, Vector2 Position, Vector2 Scale, Vector2 Velocity, Sprite* Sprite) {
+		IsAlive = true;
 		canvas = Canvas;
 		position = Position;
 		scale = Scale;
@@ -119,5 +121,5 @@ public:
 		idleSprite = Sprite;
 		currentSprite = idleSprite;
 	}
-	void Tick(list<GameObject>& objects);
+	void Tick(list<GameObject> &objects);
 };
