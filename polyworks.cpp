@@ -15,7 +15,7 @@ private:
 	Sprite* blueBlock;
 	AssetManager assetManager;
 	Bullet bullet;
-	GameObject object;
+	list<GameObject> objects;
 	BoundingBox canvas;
 public:
 	Vector2 cmdScreen;
@@ -27,13 +27,15 @@ public:
 	}
 
 	virtual bool Init() {
+		objects = list<GameObject>();
 		assetManager.Setup();
 		int size = std::min(cmdScreen.x, cmdScreen.y);
 		canvas = BoundingBox(Vector2(0, 0), Vector2(size, 0), Vector2(0, size), Vector2(size, size));
 		Sprite* sprite = createSprite(assetManager.blocks[0].idleSprite.string().c_str());
 		Sprite* spriteTwo = createSprite(assetManager.blocks[1].idleSprite.string().c_str());
+		GameObject object = GameObject(Vector2(330, 300), Vector2(120, 50), spriteTwo);
+		objects.push_back(object);
 		bullet = Bullet(canvas, Vector2(250, 350), Vector2(50, 50), Vector2(3, -3), sprite);
-		object = GameObject(Vector2(330, 300), Vector2(120, 50), spriteTwo);
 
 		return true;
 	}
@@ -49,21 +51,12 @@ public:
 
 		bool invert[2];
 
-		bullet.Tick();
-		if (bullet.CollidesWith(object)) {
-			std::cout << bullet.currentVelocity.y;
-			bullet.InvertVelocity(true, false);
-			bullet.Move(bullet.currentVelocity.x, bullet.currentVelocity.y);
-		}
-		if (bullet.CollidesWith(object)) {
-			std::cout << bullet.currentVelocity.y;
-			bullet.InvertVelocity(false, true);
-		}
+		bullet.Tick(objects);
 
 		setSpriteSize(bullet.currentSprite, bullet.scale.x, bullet.scale.y);
 		drawSprite(bullet.currentSprite, bullet.position.x, bullet.position.y);
-		setSpriteSize(object.currentSprite, object.scale.x, object.scale.y);
-		drawSprite(object.currentSprite, object.position.x, object.position.y);
+		setSpriteSize(objects.back().currentSprite, objects.back().scale.x, objects.back().scale.y);
+		drawSprite(objects.back().currentSprite, objects.back().position.x, objects.back().position.y);
 
 		return false;
 	}

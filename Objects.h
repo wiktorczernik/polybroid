@@ -119,5 +119,5 @@ public:
 		idleSprite = Sprite;
 		currentSprite = idleSprite;
 	}
-	void Tick();
+	void Tick(list<GameObject>& objects);
 };

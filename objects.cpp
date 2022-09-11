@@ -53,10 +53,21 @@ BlockAsset::BlockAsset() {
 
 #pragma endregion
 
-void Bullet::Tick() {
+void Bullet::Tick(list<GameObject> &objects) {
 	Move(currentVelocity.x, currentVelocity.y);
 	bool border[2];
 	if (CollidesBorder(border)) {
 		InvertVelocity(border[0], border[1]);
+	}
+	for (auto& object : objects) {
+		if (CollidesWith(object)) {
+			std::cout << currentVelocity.y;
+			InvertVelocity(true, false);
+			Move(currentVelocity.x, currentVelocity.y);
+		}
+		if (CollidesWith(object)) {
+			std::cout << currentVelocity.y;
+			InvertVelocity(false, true);
+		}
 	}
 }
