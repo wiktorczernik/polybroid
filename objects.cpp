@@ -1,7 +1,22 @@
 #include "Objects.h"
 #include "PolyMath.h"
 
-
+void Object::Scale(int x, int y) {
+	scale.x += x;
+	scale.y += y;
+}
+void Object::SetScale(int x, int y) {
+	scale.x = x;
+	scale.y = y;
+}
+void Object::Move(int x, int y) {
+	position.x += x;
+	position.y += y;
+}
+void Object::SetPosition(int x, int y) {
+	position.x = x;
+	position.y = y;
+}
 #pragma region GameObject 
 void GameObject::UpdateBoundingBox() {
 	boundingBox.a = position;
@@ -10,26 +25,30 @@ void GameObject::UpdateBoundingBox() {
 	boundingBox.d = Vector2(boundingBox.b.x, boundingBox.c.y);
 }
 void GameObject::Scale(int x, int y) {
-	scale.x += x;
-	scale.y += y;
+	Object::Scale(x, y);
 	UpdateBoundingBox();
 }
 void GameObject::SetScale(int x, int y) {
-	scale.x = x;
-	scale.y = y;
+	Object::SetScale(x, y);
 	UpdateBoundingBox();
 }
 void GameObject::Move(int x, int y) {
-	position.x += x;
-	position.y += y;
+	Object::Move(x, y);
 	UpdateBoundingBox();
 }
 void GameObject::SetPosition(int x, int y) {
-	position.x = x;
-	position.y = y;
+	Object::SetPosition(x, y);
 	UpdateBoundingBox();
 }
 bool GameObject::IsColliding(GameObject otherObject) {
+	return false;
+}
+bool GameObject::Hurt() {
+	health--;
+	if (health == 0)
+	{
+		return true;
+	}
 	return false;
 }
 
@@ -37,15 +56,10 @@ bool GameObject::IsColliding(GameObject otherObject) {
 
 #pragma region Block
 bool Block::Hurt() {
-	health--;
 	currentSprite = brokenSprite;
-	if (health <= 0)
-	{
-		return true;
-	}
-	return false;
+	bool result = GameObject::Hurt();
+	return result;
 }
-
 #pragma endregion
 
 void PhysicsObject::Tick() {
