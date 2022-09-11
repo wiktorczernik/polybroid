@@ -19,6 +19,7 @@ private:
 	BoundingBox canvas;
 public:
 	Vector2 cmdScreen;
+
 	virtual void PreInit(int& width, int& height, bool& fullscreen)
 	{
 		width = cmdScreen.x;
@@ -34,7 +35,9 @@ public:
 		Sprite* sprite = createSprite(assetManager.blocks[0].idleSprite.string().c_str());
 		Sprite* spriteTwo = createSprite(assetManager.blocks[1].idleSprite.string().c_str());
 		GameObject object = GameObject(Vector2(330, 300), Vector2(120, 50), spriteTwo);
+		GameObject objectTwo = GameObject(Vector2(500, 250), Vector2(120, 40), spriteTwo);
 		objects.push_back(object);
+		objects.push_front(objectTwo);
 		bullet = Bullet(canvas, Vector2(250, 350), Vector2(50, 50), Vector2(3, -3), sprite);
 
 		return true;
