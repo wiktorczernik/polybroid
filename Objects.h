@@ -9,29 +9,6 @@
 namespace fs = std::filesystem;
 using namespace std;
 
-#pragma region Assets
-enum AssetType {
-	AssetGameObject,
-	AssetBlock,
-	AssetMap
-};
-
-class Asset {
-public:
-	fs::path path;
-};
-class GameObjectAsset : public Asset {
-public:
-	fs::path idleSprite;
-};
-class BlockAsset : public GameObjectAsset {
-public:
-	fs::path brokenSprite;
-	int id;
-	int health;
-	BlockAsset();
-};
-#pragma endregion
 #pragma region Objects
 class GameObject {
 private:

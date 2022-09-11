@@ -27,17 +27,15 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="game.cpp" />
-    <ClCompile Include="managers.cpp" />
-    <ClCompile Include="map.cpp" />
+    <ClCompile Include="assets.cpp" />
     <ClCompile Include="objects.cpp" />
-    <ClCompile Include="polyworks.cpp" />
+    <ClCompile Include="game.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Framework.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Objects.h" />
-    <ClInclude Include="Managers.h" />
+    <ClInclude Include="Assets.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="PolyMath.h" />
   </ItemGroup>

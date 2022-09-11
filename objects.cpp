@@ -45,10 +45,6 @@ bool Block::Hurt() {
 	}
 	return false;
 }
-BlockAsset::BlockAsset() {
-	id = 1;
-	health = 0;
-}
 
 #pragma endregion
 

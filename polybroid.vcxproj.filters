@@ -21,20 +21,14 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="polyworks.cpp">
+    <ClCompile Include="game.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="objects.cpp">
       <Filter>Source Files\engine</Filter>
     </ClCompile>
-    <ClCompile Include="managers.cpp">
+    <ClCompile Include="assets.cpp">
       <Filter>Source Files\engine</Filter>
-    </ClCompile>
-    <ClCompile Include="game.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="map.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -47,7 +41,7 @@
     <ClInclude Include="Objects.h">
       <Filter>Header Files\engine</Filter>
     </ClInclude>
-    <ClInclude Include="Managers.h">
+    <ClInclude Include="Assets.h">
       <Filter>Header Files\engine</Filter>
     </ClInclude>
     <ClInclude Include="Map.h">

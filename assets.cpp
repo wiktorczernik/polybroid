@@ -1,4 +1,4 @@
-#include "Managers.h"
+#include "Assets.h"
 #include "Objects.h"
 #include <string>
 #include <fstream>
@@ -8,29 +8,39 @@
 namespace fs = std::filesystem;
 using namespace std;
 
+BlockAsset::BlockAsset() {
+	id = 1;
+	health = 0;
+}
 AssetManager::AssetManager() {
 	currentDir = fs::current_path().string();
 }
-void AssetManager::GetAssetPathsByType(fs::path* result, AssetType type, int amount) {
-	std::string ext = ".asset";
-	std::string path = currentDir;
+std::string AssetManager::GetExtension(AssetType type) {
+	std::string extension = ".";
 	switch (type)
 	{
-	case AssetGameObject:
-		ext = ".gameObject";
-		break;
-	case AssetBlock:
-		path += blocksDir;
-		ext = ".block";
-		break;
+	case AssetVisual:
+		extension += "visual";
+		return extension;
 	case AssetMap:
-		path += mapsDir;
-		ext = ".map";
-		break;
+		extension += "map";
+		return extension;
+	case AssetGameObject:
+		extension += "gameObject";
+		return extension;
+	case AssetBlock:
+		extension += "block";
+		return extension;
 	default:
-		break;
+		extension += "asset";
+		return extension;
 	}
+}
 
+
+void AssetManager::GetAssetPathsByType(fs::path* result, AssetType type, int amount) {
+	std::string ext = GetExtension(type);
+	std::string path = currentDir + assetsDir;
 	try {
 		int count = 0;
 		if (fs::exists(path) == false)
@@ -38,7 +48,7 @@ void AssetManager::GetAssetPathsByType(fs::path* result, AssetType type, int amo
 			std::cout << "directory doesn't exist";
 			return;
 		}
-		for (auto& p : fs::directory_iterator(path)) {
+		for (auto& p : fs::recursive_directory_iterator(path)) {
 			if (count >= amount) {
 				return;
 			}
@@ -50,8 +60,29 @@ void AssetManager::GetAssetPathsByType(fs::path* result, AssetType type, int amo
 		}
 	}
 	catch (__std_win_error e) {
-
+		std::cout << "CRITICAL ASSET MANAGER ERROR" << "\n\n\n";
 	}
+}
+fs::path AssetManager::GetAssetPathByName(std::string name, AssetType type) {
+	std::string ext = GetExtension(type);
+	std::string path = currentDir + assetsDir;
+	try {
+		if (!fs::exists(path))
+		{
+			std::cout << "directory doesn't exist";
+			return path;
+		}
+		for (auto& p : fs::recursive_directory_iterator(path)) {
+			if (p.path().filename() == name + ext) {
+				std::cout << "Loaded asset " << p.path() << '\n';
+				return p.path();
+			}
+		}
+	}
+	catch (__std_win_error e) {
+		std::cout << "CRITICAL ASSET MANAGER ERROR" << "\n\n\n";
+	}
+	return path;
 }
 void AssetManager::ReadFile(std::string* result, fs::path filePath, int amount) {
 	std::fstream file;
@@ -98,6 +129,25 @@ BlockAsset AssetManager::GetBlockAsset(fs::path path) {
 		return result;
 	}
 }
+VisualAsset AssetManager::GetVisualAsset(std::string name) {
+	std::string lines[1];
+	fs::path path = GetAssetPathByName(name, AssetVisual);
+	fs::path sprite = path.parent_path();
+	VisualAsset result = VisualAsset();
+	try {
+		ReadFile(lines, path, 1);
+
+		sprite += "\\" + lines[0];
+		result.path = path;
+		result.sprite = sprite;
+
+		return result;
+	}
+	catch (std::exception& e) {
+		cout << "Can't read file: " << e.what();
+		return result;
+	}
+}
 void AssetManager::GetBlockAssets(BlockAsset* result) {
 	fs::path paths[3];
 	GetAssetPathsByType(paths, AssetBlock, 3);
@@ -115,4 +165,7 @@ void AssetManager::GetBlockAssets(BlockAsset* result) {
 }
 void AssetManager::Setup() {
 	GetBlockAssets(blocks);
+	border = GetVisualAsset("border");
+	farlands = GetVisualAsset("farlands");
+	logo = GetVisualAsset("logo");
 }
