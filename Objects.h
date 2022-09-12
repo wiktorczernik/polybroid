@@ -104,6 +104,7 @@ public:
 };
 class PhysicsObject : public GameObject {
 protected:
+	Vector2 initVelocity;
 	BoundingBox canvas;
 public:
 	PhysicsObject() : GameObject() {
@@ -116,6 +117,7 @@ public:
 		canvas = Canvas;
 		position = Position;
 		scale = Scale;
+		initVelocity = Velocity;
 		currentVelocity = Velocity;
 		idleSprite = IdleSprite;
 		currentSprite = idleSprite;
@@ -149,8 +151,6 @@ public:
 
 class Player : public PhysicsObject {
 private:
-	Vector2 initVelocity;
-
 	int abilityMultiplier;
 
 	bool decreasePositiveAB;
@@ -194,7 +194,7 @@ public:
 		IsAlive = true;
 		health = -1;
 	}
-	Bullet(BoundingBox Canvas, Vector2 Position, Vector2 Scale, Vector2 Velocity, Sprite* Sprite) : PhysicsObject(Canvas, Position, Scale, Velocity, Sprite) {
+	Bullet(BoundingBox Canvas, Vector2 Position, Vector2 Scale, Vector2 Velocity, Vector2 DefaultVelocity, Sprite* Sprite) : PhysicsObject(Canvas, Position, Scale, Velocity, Sprite) {
 		IsAlive = true;
 		health = -1;
 		canvas = Canvas;
@@ -202,6 +202,7 @@ public:
 		canvas.d.y += Scale.y * 3;
 		position = Position;
 		scale = Scale;
+		initVelocity = DefaultVelocity;
 		currentVelocity = Velocity;
 		idleSprite = Sprite;
 		currentSprite = idleSprite;

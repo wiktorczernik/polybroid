@@ -309,7 +309,7 @@ private:
 	void InstantiateBullet(Vector2 Position) {
 		GameObjectAsset& asset = assetManager.bullet;
 		Sprite* idleSprite = GetSprite(asset.idleSprite);
-		Bullet bullet = Bullet(mapArea, Position, bulletSize, Vector2(2, -2), idleSprite);
+		Bullet bullet = Bullet(mapArea, Position, bulletSize, Vector2(2, -2), Vector2(2, -2), idleSprite);
 		bullets.push_front(bullet);
 	}
 	void InstantiateAbility() {

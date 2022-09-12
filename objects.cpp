@@ -103,27 +103,25 @@ void Bullet::Tick(list<Block>& blocks, Player& player) {
 
 	Move(0, currentVelocity.y);
 	for (Block& object : blocks) {
-		pl = CollidesWith(player);
 		bl = CollidesWith(object);
-		if (bl || pl) {
+		if (bl) {
 			InvertVelocity(false, true);
 			Move(0, currentVelocity.y);
-			if (bl && !pl) {
-				object.Hurt();
-			}
+			object.Hurt();
 		}
 	}
 	Move(currentVelocity.x, 0);
 	for (Block& object : blocks) {
-		pl = CollidesWith(player);
 		bl = CollidesWith(object);
-		if (bl || pl) {
+		if (bl) {
 			InvertVelocity(true, false);
 			Move(currentVelocity.x, 0);
-			if (bl && !pl) {
-				object.Hurt();
-			}
+			object.Hurt();
 		}
+	}
+	pl = CollidesWith(player);
+	if (pl) {
+		currentVelocity.y = -currentVelocity.y;
 	}
 	bool border[2];
 	if (CollidesBorder(border)) {
