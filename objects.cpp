@@ -240,7 +240,7 @@ void Player::AddAbility(bool IsPositive) {
 		trigger = &decreaseNegativeAB;
 		break;
 	}
-	newTimer.Setup(trigger, 10000, true);
+	newTimer.Setup(trigger, 30000, true);
 	timers.push_front(newTimer);
 }
 

@@ -65,7 +65,7 @@ public:
 	GameObjectAsset player;
 
 	BlockAsset blocks[3];
-	MapAsset maps[3];
+	MapAsset maps[5];
 
 	AssetManager();
 	void Setup();

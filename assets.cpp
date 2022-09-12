@@ -208,8 +208,8 @@ void AssetManager::GetBlockAssets(BlockAsset* result) {
 	}
 }
 void AssetManager::GetMapAssets(MapAsset* result) {
-	fs::path paths[3];
-	GetAssetPathsByType(paths, AssetMap, 3);
+	fs::path paths[5];
+	GetAssetPathsByType(paths, AssetMap, 5);
 	int index = 0;
 	for each (fs::path path in paths)
 	{

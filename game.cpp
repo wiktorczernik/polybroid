@@ -114,7 +114,7 @@ private:
 				destroySprite(curr->idleSprite);
 				bulletsAmount--;
 				bulletsOnMap--;
-				if (bulletsAmount <= 0) {
+				if (bulletsAmount <= 0 && mapIndex <= 4) {
 					cout << "\n\nYOU LOST\nPRESS LBM TO RESTART THE GAME\n\n";
 				}
 				bullets.erase(curr);
@@ -228,7 +228,7 @@ private:
 		canAbilitySpawn = false;
 		canShoot = false;
 
-		abilityTimer.Setup(&canAbilitySpawn, 10000, true);
+		abilityTimer.Setup(&canAbilitySpawn, 20000, true);
 		shootCooldown.Setup(&canShoot, 1000, false);
 
 		int squareWidth = std::min(cmdScreen.x, cmdScreen.y);
@@ -287,9 +287,9 @@ private:
 		abilities.clear();
 	}
 	void NextMap() {
-		DestroyMap();
 		mapIndex++;
-		if (mapIndex == 0) {
+		if (mapIndex > 4) {
+			return;
 		}
 		switch (mapIndex)
 		{
@@ -297,6 +297,7 @@ private:
 			cout << "\n\n" << "WELCOME TO THE POLYBROID" << "\n\n" << "LEFT ARROW & RIGHT ARROW - MOVE" << "\n" << "MOUSE POINTER - AIM" << "\n" << "LMB - SHOOT" << "\n\n";
 		default:
 			cout << "\n" << "YOUR CURRENT SCORE IS " << score << " POINTS" << '\n';
+			DestroyMap();
 			InstantiateMap(mapIndex);
 			break;
 		}
@@ -457,12 +458,12 @@ public:
 		{
 		case FRKey::RIGHT:
 			moveInput = moveInput > 0 ? 0 : moveInput;
-			break;
+			return;
 		case FRKey::LEFT:
 			moveInput = moveInput < 0 ? 0 : moveInput;
-			break;
+			return;
 		default:
-			break;
+			return;
 		}
 	}
 	
