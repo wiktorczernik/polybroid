@@ -159,8 +159,6 @@ private:
 	list<Timer> timers;
 
 	int moveInput;
-	bool shoot;
-	Vector2 mousePos;
 public:
 	Player() : PhysicsObject() {
 
@@ -180,10 +178,8 @@ public:
 		decreasePositiveAB = false;
 		decreaseNegativeAB = false;
 	}
-	void UpdateInput(int Move, bool Shoot, Vector2 MousePos) {
+	void UpdateInput(int Move) {
 		moveInput = Move;
-		shoot = Shoot;
-		mousePos = mousePos;
 	}
 	void AddAbility(bool IsPositive);
 	void Tick(int deltaTime);

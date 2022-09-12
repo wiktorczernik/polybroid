@@ -40,6 +40,7 @@ private:
 	int blocksToDestroy;
 
 	int moveInput;
+	Vector2 mousePos;
 
 	Timer abilityTimer;
 	bool canAbilitySpawn;
@@ -54,7 +55,7 @@ private:
 	clock_t currentTickTime;
 
 	void GameTick() {
-		player.UpdateInput(moveInput, false, Vector2(0, 0));
+		player.UpdateInput(moveInput);
 
 		player.Tick(deltaTime);
 
@@ -281,15 +282,22 @@ private:
 	void DestroyMap() {
 		bullets.clear();
 		blocks.clear();
+		abilities.clear();
 	}
 	void NextMap() {
 		DestroyMap();
 		mapIndex++;
 		if (mapIndex == 0) {
-			cout << "\n\n" << "WELCOME TO THE POLYBROID" << "\n\n" << "LEFT ARROW & RIGHT ARROW - MOVE" << "\n" << "MOUSE POINTER - AIM" << "\n" << "LMB - SHOOT" << "\n\n";
 		}
-		cout << "\n" << "YOUR CURRENT SCORE IS " << score << " POINTS" << '\n';
-		InstantiateMap(mapIndex);
+		switch (mapIndex)
+		{
+		case 0:
+			cout << "\n\n" << "WELCOME TO THE POLYBROID" << "\n\n" << "LEFT ARROW & RIGHT ARROW - MOVE" << "\n" << "MOUSE POINTER - AIM" << "\n" << "LMB - SHOOT" << "\n\n";
+		default:
+			cout << "\n" << "YOUR CURRENT SCORE IS " << score << " POINTS" << '\n';
+			InstantiateMap(mapIndex);
+			break;
+		}
 	}
 #pragma endregion
 	void InstantiatePlayer() {
@@ -306,10 +314,10 @@ private:
 		Block block = Block(position, blockSize, idleSprite, brokenSprite, asset.id, asset.health);
 		blocks.push_front(block);
 	}
-	void InstantiateBullet(Vector2 Position) {
+	void InstantiateBullet(Vector2 Position, Vector2 Velocity) {
 		GameObjectAsset& asset = assetManager.bullet;
 		Sprite* idleSprite = GetSprite(asset.idleSprite);
-		Bullet bullet = Bullet(mapArea, Position, bulletSize, Vector2(2, -2), Vector2(2, -2), idleSprite);
+		Bullet bullet = Bullet(mapArea, Position, bulletSize, Velocity, Vector2(2, -2), idleSprite);
 		bullets.push_front(bullet);
 	}
 	void InstantiateAbility() {
@@ -342,10 +350,31 @@ private:
 			NextMap();
 		}
 		if (canShoot && bulletsOnMap < bulletsAmount) {
+			int x = borderArea.MaxX() / 6;
+			int xa = (mousePos.x) / x;
+
+			xa = std::clamp(xa - 3, -3, 3);
+			int ya = -2;
+			
+			int speed = std::abs(xa * ya);
+			
+			if (speed != 4) {
+				cout << "unofrtuntaet";
+				int Axa = std::abs(xa);
+				double ratio = Axa / 4.0;
+				double unwanted = 4.0 * ratio;
+				ya = 4 - unwanted;
+				ya = -ya;
+			}
+
+			cout << xa << " " << ya << '\n';
+
+			Vector2 velocity = Vector2(xa, ya);
+
 			bulletsOnMap++;
 			shootCooldown.Restart();
-			Vector2 pos = Vector2(player.position.x + (playerSize.x / 2) - (bulletSize.x / 2), player.position.y - (bulletSize.y * 2));
-			InstantiateBullet(pos);
+			Vector2 pos = Vector2(player.position.x + (playerSize.x / 2) - (bulletSize.x / 2), player.position.y - (bulletSize.y));
+			InstantiateBullet(pos, velocity);
 		}
 	}
 
@@ -386,7 +415,7 @@ public:
 		return false;
 	}
 	virtual void onMouseMove(int x, int y, int xrelative, int yrelative) {
-
+		mousePos = Vector2(x, y);
 	}
 
 	virtual void onMouseButtonClick(FRMouseButton button, bool isReleased) {
