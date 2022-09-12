@@ -58,7 +58,12 @@ public:
 	VisualAsset farlands;
 	VisualAsset logo;
 
-	GameObjectAsset abilities[2];
+	GameObjectAsset positiveAbility;
+	GameObjectAsset negativeAbility;
+
+	GameObjectAsset bullet;
+	GameObjectAsset player;
+
 	BlockAsset blocks[3];
 	MapAsset maps[3];
 
@@ -66,6 +71,7 @@ public:
 	void Setup();
 	void GetBlockAssets(BlockAsset* result);
 	void GetMapAssets(MapAsset* result);
+	GameObjectAsset GetGameObjectAsset(std::string name);
 	VisualAsset GetVisualAsset(std::string name);
 	BlockAsset GetBlockAsset(fs::path path);
 	MapAsset GetMapAsset(fs::path path);

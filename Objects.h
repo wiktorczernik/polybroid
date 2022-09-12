@@ -146,25 +146,15 @@ public:
 };
 #pragma endregion
 
-class Bullet : public PhysicsObject {
-public:
-	Bullet() : PhysicsObject() {
-		IsAlive = true;
-		health = -1;
-	}
-	Bullet(BoundingBox Canvas, Vector2 Position, Vector2 Scale, Vector2 Velocity, Sprite* Sprite) : PhysicsObject(Canvas, Position, Scale, Velocity, Sprite) {
-		IsAlive = true;
-		health = -1;
-		canvas = Canvas;
-		position = Position;
-		scale = Scale;
-		currentVelocity = Velocity;
-		idleSprite = Sprite;
-		currentSprite = idleSprite;
-	}
-	void Tick(list<Block> &objects);
-};
 class Player : public PhysicsObject {
+private:
+	Vector2 initVelocity;
+	int positiveABmultiply;
+	int negativeABmultiply;
+
+	int moveInput;
+	bool shoot;
+	Vector2 mousePos;
 public:
 	Player() : PhysicsObject() {
 
@@ -175,18 +165,42 @@ public:
 		canvas = Canvas;
 		position = Position;
 		scale = Scale;
+		initVelocity = Velocity;
 		currentVelocity = Velocity;
 		idleSprite = IdleSprite;
 		currentSprite = idleSprite;
 	}
+	void UpdateInput(int Move, bool Shoot, Vector2 MousePos) {
+		moveInput = Move;
+		shoot = Shoot;
+		mousePos = mousePos;
+		cout << moveInput << '\n';
+	}
+	void Tick();
+};
+class Bullet : public PhysicsObject {
+public:
+	Bullet() : PhysicsObject() {
+		IsAlive = true;
+		health = -1;
+	}
+	Bullet(BoundingBox Canvas, Vector2 Position, Vector2 Scale, Vector2 Velocity, Sprite* Sprite) : PhysicsObject(Canvas, Position, Scale, Velocity, Sprite) {
+		IsAlive = true;
+		health = -1;
+		canvas = Canvas;
+		canvas.c.y += Scale.y * 3;
+		canvas.d.y += Scale.y * 3;
+		position = Position;
+		scale = Scale;
+		currentVelocity = Velocity;
+		idleSprite = Sprite;
+		currentSprite = idleSprite;
+	}
+	void Tick(list<Block>& objects, Player& player);
 };
 class Ability : public PhysicsObject {
 public:
 	bool isPositive;
-	Ability() : PhysicsObject() {
-		IsAlive = true;
-		health = -1;
-	}
 	Ability(BoundingBox Canvas, Vector2 Position, Vector2 Scale, Vector2 Velocity, bool IsPositive, Sprite* Sprite) : PhysicsObject(Canvas, Position, Scale, Velocity, Sprite) {
 		IsAlive = true;
 		health = -1;
@@ -203,5 +217,5 @@ public:
 		isPositive = IsPositive;
 
 	}
-	void Tick();
+	void Tick(Player& player);
 };

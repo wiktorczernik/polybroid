@@ -102,10 +102,14 @@ void AssetManager::ReadFile(std::string* result, fs::path filePath, int amount) 
 MapAsset AssetManager::GetMapAsset(fs::path path) {
 	std::string lines[18];
 	MapAsset result = MapAsset();
+	fs::path background = path.parent_path();
 	try {
 		ReadFile(lines, path, 18);
 
+		background += "\\" + lines[1];
+
 		result.id = std::stoi(lines[0]);
+		result.background = background;
 		int value = 0;
 		for (int x = 2; x < 18; x++) {
 			for (int y = 0; y < 8; y++) {
@@ -172,6 +176,25 @@ VisualAsset AssetManager::GetVisualAsset(std::string name) {
 		return result;
 	}
 }
+GameObjectAsset AssetManager::GetGameObjectAsset(std::string name) {
+	std::string lines[1];
+	fs::path path = GetAssetPathByName(name, AssetGameObject);
+	fs::path sprite = path.parent_path();
+	GameObjectAsset result = GameObjectAsset();
+	try {
+		ReadFile(lines, path, 1);
+
+		sprite += "\\" + lines[0];
+		result.path = path;
+		result.idleSprite = sprite;
+
+		return result;
+	}
+	catch (std::exception& e) {
+		cout << "Can't read file: " << e.what();
+		return result;
+	}
+}
 void AssetManager::GetBlockAssets(BlockAsset* result) {
 	fs::path paths[3];
 	GetAssetPathsByType(paths, AssetBlock, 3);
@@ -181,6 +204,7 @@ void AssetManager::GetBlockAssets(BlockAsset* result) {
 		BlockAsset block = GetBlockAsset(path);
 		index = block.id - 1;
 		if (index >= sizeof(result)) {
+			std::cout << "CONTINUE" << '\n';
 			std::cout << "CONTINUE" << '\n';
 			continue;
 		}
@@ -205,6 +229,12 @@ void AssetManager::GetMapAssets(MapAsset* result) {
 void AssetManager::Setup() {
 	GetBlockAssets(blocks);
 	GetMapAssets(maps);
+
+	positiveAbility = GetGameObjectAsset("positiveAB");
+	negativeAbility = GetGameObjectAsset("negativeAB");
+	bullet = GetGameObjectAsset("bullet");
+	player = GetGameObjectAsset("player");
+
 	border = GetVisualAsset("border");
 	farlands = GetVisualAsset("farlands");
 	logo = GetVisualAsset("logo");

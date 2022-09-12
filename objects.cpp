@@ -94,7 +94,7 @@ bool Block::Hurt() {
 }
 #pragma endregion
 
-void Bullet::Tick(list<Block>& blocks) {
+void Bullet::Tick(list<Block>& blocks, Player& player) {
 	Move(0, currentVelocity.y);
 	for (Block& object : blocks) {
 		if (CollidesWith(object)) {
@@ -113,21 +113,36 @@ void Bullet::Tick(list<Block>& blocks) {
 	}
 	bool border[2];
 	if (CollidesBorder(border)) {
+		if (border[1] == true && position.y > canvas.MaxY() / 2) {
+			//IsAlive = false;
+		}
 		InvertVelocity(border[0], border[1]);
 	}
 }
 
-void Ability::Tick() {
+void Player::Tick() {
+	currentVelocity = Vector2(initVelocity.x * moveInput, 0);
+	Move(currentVelocity.x, currentVelocity.y);
+	bool border[2];
+	if (CollidesBorder(border)) {
+		if (border[0] == true) {
+			SetPosition((position.x >= canvas.MaxX()/2) ? canvas.MaxX() - scale.x : canvas.MinX(), position.y);
+		}
+	}
+}
+
+void Ability::Tick(Player& player) {
 
 	/*if (CollidesWith(player)) {
 		IsAlive = false;
 	}*/
-	cout << "Ability ticks" << '\n';
 
 	bool border[2];
+	if (CollidesWith(player)) {
+		IsAlive = false;
+	}
 	if (CollidesBorder(border)) {
 		if (border[1] == true && position.y > canvas.MaxY()/2) {
-			cout << "Ability is dead!" << '\n';
 			IsAlive = false;
 		}
 		InvertVelocity(border[0], border[1]);
