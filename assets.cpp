@@ -8,13 +8,7 @@
 namespace fs = std::filesystem;
 using namespace std;
 
-BlockAsset::BlockAsset() {
-	id = 1;
-	health = 0;
-}
-AssetManager::AssetManager() {
-	currentDir = fs::current_path().string();
-}
+#pragma region Helpers
 std::string AssetManager::GetExtension(AssetType type) {
 	std::string extension = ".";
 	switch (type)
@@ -36,8 +30,9 @@ std::string AssetManager::GetExtension(AssetType type) {
 		return extension;
 	}
 }
+#pragma endregion
 
-
+#pragma region Reading
 void AssetManager::GetAssetPathsByType(fs::path* result, AssetType type, int amount) {
 	std::string ext = GetExtension(type);
 	std::string path = currentDir + assetsDir;
@@ -97,7 +92,9 @@ void AssetManager::ReadFile(std::string* result, fs::path filePath, int amount) 
 		file.close();
 	}
 }
+#pragma endregion
 
+#pragma region Get Assets
 MapAsset AssetManager::GetMapAsset(fs::path path) {
 	std::string lines[18];
 	MapAsset result = MapAsset();
@@ -191,6 +188,8 @@ GameObjectAsset AssetManager::GetGameObjectAsset(std::string name) {
 		return result;
 	}
 }
+#pragma endregion
+#pragma region Returning
 void AssetManager::GetBlockAssets(BlockAsset* result) {
 	fs::path paths[3];
 	GetAssetPathsByType(paths, AssetBlock, 3);
@@ -222,6 +221,11 @@ void AssetManager::GetMapAssets(MapAsset* result) {
 		result[index] = block;
 	}
 }
+#pragma endregion
+#pragma region Setup
+AssetManager::AssetManager() {
+	currentDir = fs::current_path().string();
+}
 void AssetManager::Setup() {
 	GetBlockAssets(blocks);
 	GetMapAssets(maps);
@@ -236,3 +240,4 @@ void AssetManager::Setup() {
 	logo = GetVisualAsset("logo");
 	ending = GetVisualAsset("thanks");
 }
+#pragma endregion

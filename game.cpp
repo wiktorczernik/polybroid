@@ -3,13 +3,11 @@
 #include "Framework.h"
 #include "PolyMath.h"
 #include <iostream>
-#include <regex>
 #include "Objects.h"
 #include "Assets.h"
 
 using namespace std;
 
-/* Test Framework realization */
 class Game : public Framework {
 private:
 	AssetManager assetManager;
@@ -56,6 +54,7 @@ private:
 	clock_t previousTickTime;
 	clock_t currentTickTime;
 
+#pragma region Important
 	void GameTick() {
 		abilityTimer.Tick(deltaTime);
 		shootCooldown.Tick(deltaTime);
@@ -63,8 +62,6 @@ private:
 		if (canAbilitySpawn && bulletsAmount > 0) {
 			InstantiateAbility();
 		}
-		auto begin = bullets.cbegin();
-
 
 		PhysTick();
 		DestroyDeadmen();
@@ -78,15 +75,39 @@ private:
 
 		player.Tick(deltaTime);
 
-		for (auto& a : abilities) {
-			a.Tick(player);
+		for (auto& a : abilities) a.Tick(player);
+		for (auto& b : bullets) b.Tick(blocks, player);
+	}
+	void Shoot() {
+		if (bulletsAmount <= 0) {
+			Restart();
 		}
-		for (auto& b : bullets)
-		{
-			b.Tick(blocks, player);
+		if (canShoot && bulletsOnMap < bulletsAmount) {
+			shootCooldown.Restart();
+			bulletsOnMap++;
+
+			Vector2 velocity = Vector2(2, -2);
+
+			int mX = mousePos.x;
+			int pX = player.position.x + (player.scale.x / 2);
+
+			bool isCenter = std::abs(pX - mX) < (int)(player.scale.x * 0.66);
+
+			switch (isCenter)
+			{
+			case true:
+				velocity.x = 0;
+				velocity.y = -3;
+				break;
+			case false:
+				velocity.x = mX < pX ? -velocity.x : velocity.x;
+				break;
+			}
+
+			Vector2 pos = Vector2(player.position.x + (playerSize.x / 2) - (bulletSize.x / 2), player.position.y - (bulletSize.y));
+			InstantiateBullet(pos, velocity);
 		}
 	}
-
 	void DestroyDeadmen() {
 
 		//HERE COMES THE HARDCODE BABY
@@ -133,7 +154,7 @@ private:
 			}
 		}
 	}
-
+#pragma endregion
 #pragma region Drawing
 	Sprite* GetSprite(fs::path Path) {
 		return createSprite(Path.string().c_str());
@@ -152,28 +173,26 @@ private:
 		setSpriteSize(object.currentSprite, object.scale.x, object.scale.y);
 		drawSprite(object.currentSprite, object.position.x, object.position.y);
 	}
-
 	void Draw() {
-		drawTestBackground();
+		drawTestBackground(); // DONT TOUCH IT! I INSIST!
 		DrawVisualObject(background);
 
-		for each (Block block in blocks)
-		{
-			DrawGameObject(block);
-		}
-		for each (Ability ability in abilities) {
-			DrawGameObject(ability);
-		}
-		for each (Bullet bullet in bullets)
-		{
-			DrawGameObject(bullet);
-		}
+		for each (Block block in blocks) DrawGameObject(block);
+		for each (Ability ability in abilities) DrawGameObject(ability);
+		for each (Bullet bullet in bullets) DrawGameObject(bullet);
+
 		DrawGameObject(player);
 		DrawOverlay();
 	}
-
-#pragma region Overlay
-
+	void DrawOverlay() {
+		if (farlands.sprite != nullptr) {
+			DrawVisualObject(farlands);
+			DrawVisualObject(logo);
+		}
+		DrawVisualObject(border);
+	}
+#pragma endregion
+#pragma region Setup
 	void SetupOverlay() {
 		border = VisualObject();
 		border.sprite = GetSprite(assetManager.border.sprite);
@@ -208,16 +227,6 @@ private:
 
 		border.SetScale(borderArea.MaxX(), borderArea.MaxY());
 	}
-	void DrawOverlay() {
-		if (farlands.sprite != nullptr) {
-			DrawVisualObject(farlands);
-			DrawVisualObject(logo);
-		}
-		DrawVisualObject(border);
-	}
-#pragma endregion
-#pragma endregion
-
 	void SetupVariables() {
 		score = 0;
 		blocksToDestroy = 0;
@@ -241,20 +250,20 @@ private:
 		mapArea.d.x *= 0.955;
 		mapArea.a.x = borderArea.b.x - mapArea.b.x;
 		mapArea.c.x = mapArea.a.x;
-		
+
 		mapArea.a.y = mapArea.a.x;
 		mapArea.b.y = mapArea.a.y;
-		
+
 		background = VisualObject();
 		background.SetPosition(mapArea.MinX(), mapArea.MinY());
 		background.SetScale(mapArea.MaxX(), mapArea.MaxY());
 
-		blockSize = Vector2((mapArea.MaxX()-mapArea.MinX()) / 8, (mapArea.MaxY() - mapArea.MinX()) / 16);
+		blockSize = Vector2((mapArea.MaxX() - mapArea.MinX()) / 8, (mapArea.MaxY() - mapArea.MinX()) / 16);
 		abilitySize = Vector2(blockSize.x, blockSize.x);
 		bulletSize = Vector2(blockSize.y, blockSize.y);
-		playerSize = Vector2(blockSize.x*2, blockSize.y);
+		playerSize = Vector2(blockSize.x * 2, blockSize.y);
 	}
-
+#pragma endregion
 #pragma region Map
 	void InstantiateMap(int& index) {
 		MapAsset& map = assetManager.maps[index];
@@ -308,7 +317,15 @@ private:
 			break;
 		}
 	}
+	void Restart() {
+		bulletsAmount = 3;
+		bulletsOnMap = 0;
+		mapIndex = -1;
+		score = 0;
+		NextMap();
+	}
 #pragma endregion
+#pragma region Spawning
 	void InstantiatePlayer() {
 		GameObjectAsset& asset = assetManager.player;
 		Vector2 position = Vector2(mapArea.MaxX() / 2 - (playerSize.x/2), mapArea.MaxY() * 0.95 - (playerSize.y));
@@ -350,52 +367,17 @@ private:
 		abilities.push_front(ability);
 		//currentAbility = ability;
 	}
-	void Shoot() {
-		if (bulletsAmount <= 0) {
-			bulletsAmount = 3;
-			bulletsOnMap = 0;
-			mapIndex = -1;
-			score = 0;
-			NextMap();
-		}
-		if (canShoot && bulletsOnMap < bulletsAmount) {
-			shootCooldown.Restart();
-			bulletsOnMap++;
-
-			Vector2 velocity = Vector2(2, -2);
-			
-			int mX = mousePos.x;
-			int pX = player.position.x + (player.scale.x / 2);
-
-			bool isCenter = std::abs(pX - mX) < (int)(player.scale.x * 0.66);
-
-			switch (isCenter)
-			{
-			case true:
-				velocity.x = 0;
-				velocity.y = -3;
-				break;
-			case false:
-				velocity.x = mX < pX ? -velocity.x: velocity.x;
-				break;
-			}
-
-			Vector2 pos = Vector2(player.position.x + (playerSize.x / 2) - (bulletSize.x / 2), player.position.y - (bulletSize.y));
-			InstantiateBullet(pos, velocity);
-		}
-	}
+#pragma endregion
 
 public:
 	Vector2 cmdScreen;
-
+#pragma region Important
 	virtual void PreInit(int& width, int& height, bool& fullscreen)
 	{
 		width = cmdScreen.x;
 		height = cmdScreen.y;
 		fullscreen = false;
 	}
-
-
 	virtual bool Init() {
 		assetManager.Setup();
 
@@ -406,24 +388,24 @@ public:
 		previousTickTime = clock();
 		return true;
 	}
-
 	virtual void Close() {
 
 	}
-
 	virtual bool Tick() {
 		currentTickTime = clock();
 		deltaTime = (int)(currentTickTime - previousTickTime);
+
 		GameTick();
 		Draw();
 		
 		previousTickTime = currentTickTime;
 		return false;
 	}
+#pragma endregion
+#pragma region Input
 	virtual void onMouseMove(int x, int y, int xrelative, int yrelative) {
 		mousePos = Vector2(x, y);
 	}
-
 	virtual void onMouseButtonClick(FRMouseButton button, bool isReleased) {
 		switch (button)
 		{
@@ -434,7 +416,6 @@ public:
 			break;
 		}
 	}
-
 	virtual void onKeyPressed(FRKey k) {
 		switch (k)
 		{
@@ -444,14 +425,10 @@ public:
 		case FRKey::LEFT:
 			moveInput = -1;
 			break;
-		case FRKey::UP:
-			NextMap();
-			break;
 		default:
 			break;
 		}
 	}
-
 	virtual void onKeyReleased(FRKey k) {
 		switch (k)
 		{
@@ -465,6 +442,7 @@ public:
 			return;
 		}
 	}
+#pragma endregion
 	
 	virtual const char* GetTitle() override
 	{
@@ -477,13 +455,14 @@ public:
 		blocks = list<Block>();
 
 		abilityTimer = Timer();
+		shootCooldown = Timer();
 	}
 };
 int main(int argc, char* argv[])
 {
 	Game* framework = new Game();
 
-	Vector2 defaultScreenSize = Vector2(800, 600);
+	Vector2 defaultScreenSize = Vector2(600, 600);
 	Vector2 screenSize = defaultScreenSize;
 	string command;
 

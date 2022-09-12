@@ -1,7 +1,7 @@
 #include "Objects.h"
 #include "PolyMath.h"
 
-
+#pragma region Timer
 Timer::Timer() {
 	currentTime = 0;
 	triggerTime = 10000;
@@ -34,6 +34,8 @@ void Timer::Restart() {
 	*trigger = false;
 	currentTime = 0;
 }
+#pragma endregion
+#pragma region Object
 void Object::Scale(int x, int y) {
 	scale.x += x;
 	scale.y += y;
@@ -50,6 +52,7 @@ void Object::SetPosition(int x, int y) {
 	position.x = x;
 	position.y = y;
 }
+#pragma endregion
 #pragma region GameObject 
 void GameObject::UpdateBoundingBox() {
 	boundingBox.a = position;
@@ -86,9 +89,7 @@ bool GameObject::Hurt() {
 	IsAlive = true;
 	return false;
 }
-
 #pragma endregion
-
 #pragma region Block
 bool Block::Hurt() {
 	currentSprite = brokenSprite;
@@ -96,7 +97,7 @@ bool Block::Hurt() {
 	return result;
 }
 #pragma endregion
-
+#pragma region Bullet
 void Bullet::Tick(list<Block>& blocks, Player& player) {
 	bool bl = false;
 	bool pl = false;
@@ -174,7 +175,8 @@ void Bullet::Tick(list<Block>& blocks, Player& player) {
 		}
 	}
 }
-
+#pragma endregion
+#pragma region Player
 void Player::Tick(int deltaTime) {
 
 	std::list<Timer>::iterator bi = timers.begin();
@@ -220,7 +222,6 @@ void Player::Tick(int deltaTime) {
 		}
 	}
 }
-
 void Player::AddAbility(bool IsPositive) {
 	Timer newTimer = Timer();
 	bool* trigger;
@@ -238,7 +239,8 @@ void Player::AddAbility(bool IsPositive) {
 	newTimer.Setup(trigger, 30000, true);
 	timers.push_front(newTimer);
 }
-
+#pragma endregion
+#pragma region Ability
 void Ability::Tick(Player& player) {
 
 	if (CollidesWith(player)) {
@@ -254,3 +256,4 @@ void Ability::Tick(Player& player) {
 	}
 	Move(currentVelocity.x, currentVelocity.y);
 }
+#pragma endregion

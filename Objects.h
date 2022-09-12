@@ -9,6 +9,7 @@
 namespace fs = std::filesystem;
 using namespace std;
 
+#pragma region Objects
 class Timer {
 private:
 	unsigned int currentTime;
@@ -22,8 +23,6 @@ public:
 	void Tick(int deltaTime);
 	void Restart();
 };
-
-#pragma region Objects
 class Object {
 public:
 	Vector2 scale;
@@ -40,7 +39,6 @@ public:
 		scale = Scale;
 	}
 };
-
 class VisualObject : public Object {
 public:
 	Sprite* sprite;
@@ -147,8 +145,6 @@ public:
 	}
 	void Tick();
 };
-#pragma endregion
-
 class Player : public PhysicsObject {
 private:
 	int abilityMultiplier;
@@ -166,6 +162,7 @@ public:
 	}
 	Player(BoundingBox Canvas, Vector2 Position, Vector2 Scale, Vector2 Velocity, Sprite* IdleSprite) : PhysicsObject(Canvas, Position, Scale, Velocity, IdleSprite) {
 		IsAlive = true;
+		catchedBullet = false;
 		health = -1;
 		canvas = Canvas;
 		position = Position;
@@ -227,3 +224,4 @@ public:
 	}
 	void Tick(Player& player);
 };
+#pragma endregion

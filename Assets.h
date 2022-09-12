@@ -15,12 +15,10 @@ enum AssetType {
 	AssetGameObject,
 	AssetBlock
 };
-
 class Asset {
 public:
 	fs::path path;
 };
-
 class MapAsset : Asset {
 public:
 	fs::path background;
@@ -31,7 +29,6 @@ class VisualAsset : public Asset {
 public:
 	fs::path sprite;
 };
-
 class GameObjectAsset : public Asset {
 public:
 	fs::path idleSprite;
@@ -41,10 +38,9 @@ public:
 	fs::path brokenSprite;
 	int id;
 	int health;
-	BlockAsset();
 };
 #pragma endregion
-
+#pragma region Asset Manager
 class AssetManager {
 private:
 	std::string currentDir;
@@ -80,3 +76,4 @@ public:
 	void GetAssetPathsByType(fs::path* result, AssetType type, int amount);
 	fs::path GetAssetPathByName(std::string name, AssetType type);
 };
+#pragma endregion
