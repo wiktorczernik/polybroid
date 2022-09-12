@@ -360,15 +360,12 @@ private:
 			int speed = std::abs(xa * ya);
 			
 			if (speed != 4) {
-				cout << "unofrtuntaet";
 				int Axa = std::abs(xa);
 				double ratio = Axa / 4.0;
 				double unwanted = 4.0 * ratio;
 				ya = 4 - unwanted;
 				ya = -ya;
 			}
-
-			cout << xa << " " << ya << '\n';
 
 			Vector2 velocity = Vector2(xa, ya);
 

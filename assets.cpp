@@ -55,7 +55,6 @@ void AssetManager::GetAssetPathsByType(fs::path* result, AssetType type, int amo
 			if (p.path().extension() == ext) {
 				result[count] = p.path();
 				count++;
-				std::cout << "Loaded asset " << p.path() << '\n';
 			}
 		}
 	}

@@ -121,7 +121,43 @@ void Bullet::Tick(list<Block>& blocks, Player& player) {
 	}
 	pl = CollidesWith(player);
 	if (pl) {
-		currentVelocity.y = -currentVelocity.y;
+		Vector2 finalMultiply = Vector2(2, 2);
+		if (boundingBox.MaxY() < player.boundingBox.MinY() + player.scale.y / 2) {
+			InvertVelocity(false, true);
+			finalMultiply.y * 3;
+		}
+		int max = std::abs(player.scale.x) / 2;
+
+		int bc = position.x + (scale.x / 2);
+		int pc = player.position.x + (player.scale.x / 2);
+
+		int diff = std::abs(bc - pc);
+
+		double ratio = std::clamp((double)diff / max, 0.0, 1.0);
+
+
+		int newX = 3 * ratio;
+		int newY = std::abs(4 - newX);
+
+		newX *= (bc < pc ? -1 : 1);
+		newY *= std::clamp((currentVelocity.y / std::abs(currentVelocity.y)), -1, 1);
+
+
+		newY = std::clamp(newY, -3, 3);
+
+		currentVelocity.x = newX;
+		currentVelocity.y = newY;
+
+		int speed = std::abs(currentVelocity.x * currentVelocity.y);
+
+		if (speed != 0 && speed != 3) {
+			cout << currentVelocity.x << " + " << currentVelocity.y << " = " << speed << "\n";
+			cout << speed << "\n";
+		}
+		
+
+		Move(currentVelocity.x*finalMultiply.x, currentVelocity.y*finalMultiply.y);
+
 	}
 	bool border[2];
 	if (CollidesBorder(border)) {
@@ -129,6 +165,7 @@ void Bullet::Tick(list<Block>& blocks, Player& player) {
 			IsAlive = false;
 		}
 		InvertVelocity(border[0], border[1]);
+		Move(currentVelocity.x, currentVelocity.y);
 	}
 }
 
@@ -148,16 +185,12 @@ void Player::Tick(int deltaTime) {
 		timer.Tick(deltaTime);
 	}
 	if (decreasePositiveAB) {
-		cout << "old: " << abilityMultiplier << "; new: ";
 		abilityMultiplier = std::clamp(abilityMultiplier - 1, -3, 3);
 		decreasePositiveAB = false;
-		cout << abilityMultiplier << ";\n";
 	}
 	if (decreaseNegativeAB) {
-		cout << "old: " << abilityMultiplier << "; new: ";
 		abilityMultiplier = std::clamp(abilityMultiplier + 1, -3, 3);
 		decreaseNegativeAB = false;
-		cout << abilityMultiplier << ";\n";
 	}
 
 	int xSpeed = initVelocity.x;
@@ -172,7 +205,6 @@ void Player::Tick(int deltaTime) {
 	xSpeed = xSpeed != 0 ? ((std::clamp(xSpeed, minSpeed, maxSpeed))*moveInput) : 0;
 
 	currentVelocity = Vector2(xSpeed, 0);
-
 
 	Move(currentVelocity.x, currentVelocity.y);
 	bool border[2];
