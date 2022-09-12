@@ -95,20 +95,31 @@ bool Block::Hurt() {
 #pragma endregion
 
 void Bullet::Tick(list<Block>& blocks, Player& player) {
+	bool bl = false;
+	bool pl = false;
+
 	Move(0, currentVelocity.y);
 	for (Block& object : blocks) {
-		if (CollidesWith(object)) {
+		pl = CollidesWith(player);
+		bl = CollidesWith(object);
+		if (bl || pl) {
 			InvertVelocity(false, true);
 			Move(0, currentVelocity.y);
-			object.Hurt();
+			if (bl && !pl) {
+				object.Hurt();
+			}
 		}
 	}
 	Move(currentVelocity.x, 0);
 	for (Block& object : blocks) {
-		if (CollidesWith(object)) {
+		pl = CollidesWith(player);
+		bl = CollidesWith(object);
+		if (bl || pl) {
 			InvertVelocity(true, false);
 			Move(currentVelocity.x, 0);
-			object.Hurt();
+			if (bl && !pl) {
+				object.Hurt();
+			}
 		}
 	}
 	bool border[2];

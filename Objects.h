@@ -174,7 +174,6 @@ public:
 		moveInput = Move;
 		shoot = Shoot;
 		mousePos = mousePos;
-		cout << moveInput << '\n';
 	}
 	void Tick();
 };
