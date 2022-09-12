@@ -101,6 +101,8 @@ void Bullet::Tick(list<Block>& blocks, Player& player) {
 	bool bl = false;
 	bool pl = false;
 
+	player.catchedBullet = false;
+
 	Move(0, currentVelocity.y);
 	for (Block& object : blocks) {
 		bl = CollidesWith(object);
@@ -121,6 +123,7 @@ void Bullet::Tick(list<Block>& blocks, Player& player) {
 	}
 	pl = CollidesWith(player);
 	if (pl) {
+		player.catchedBullet = true;
 		Vector2 finalMultiply = Vector2(2, 2);
 		if (boundingBox.MaxY() < player.boundingBox.MinY() + player.scale.y / 2) {
 			InvertVelocity(false, true);

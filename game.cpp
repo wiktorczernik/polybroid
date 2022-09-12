@@ -69,7 +69,7 @@ private:
 		PhysTick();
 		DestroyDeadmen();
 
-		if (blocksToDestroy <= 0) {
+		if (blocksToDestroy <= 0 && player.catchedBullet) {
 			NextMap();
 		}
 	}
@@ -263,6 +263,7 @@ private:
 
 		blocksToDestroy = 0;
 		bulletsOnMap = 0;
+		
 		cout << "BULLETS IN MAGAZINE: " << bulletsAmount << '\n';
 		int value = 0;
 		for (int x = 0; x < 16; x++) {
@@ -290,6 +291,7 @@ private:
 	}
 	void NextMap() {
 		mapIndex++;
+
 		if (mapIndex > 4) {
 			background.sprite = GetSprite(assetManager.ending.sprite);
 			blocks.clear();
@@ -442,9 +444,9 @@ public:
 		case FRKey::LEFT:
 			moveInput = -1;
 			break;
-		/*case FRKey::UP:
+		case FRKey::UP:
 			NextMap();
-			break;*/
+			break;
 		default:
 			break;
 		}

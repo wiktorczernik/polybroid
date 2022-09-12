@@ -160,6 +160,7 @@ private:
 
 	int moveInput;
 public:
+	bool catchedBullet;
 	Player() : PhysicsObject() {
 
 	}
