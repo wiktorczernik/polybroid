@@ -8,6 +8,7 @@ Timer::Timer() {
 }
 void Timer::Setup(bool* Trigger, unsigned int TriggerTime, bool AutoRestart) {
 	trigger = Trigger;
+	triggered = false;
 	*trigger = false;
 	triggerTime = TriggerTime;
 	autoRestart = AutoRestart;
@@ -18,10 +19,12 @@ void Timer::Tick(int deltaTime) {
 	if (autoRestart && *trigger == true) {
 		currentTime -= triggerTime;
 		*trigger = false;
+		triggered = false;
 	}
 	currentTime += deltaTime;
 	if (currentTime >= triggerTime) {
 		*trigger = true;
+		triggered = true;
 		if (!autoRestart) {
 			currentTime = triggerTime;
 		}
@@ -139,6 +142,16 @@ void Player::Tick() {
 		if (border[0] == true) {
 			SetPosition((position.x >= canvas.MaxX()/2) ? canvas.MaxX() - scale.x : canvas.MinX(), position.y);
 		}
+	}
+}
+
+void Player::AddAbility(bool IsPositive) {
+	switch (IsPositive)
+	{
+	case true:
+		break;
+	case false:
+		break;
 	}
 }
 

@@ -16,6 +16,7 @@ private:
 	unsigned int triggerTime;
 public:
 	bool autoRestart;
+	bool triggered;
 	Timer();
 	void Setup(bool* Trigger, unsigned int TriggerTime, bool AutoRestart);
 	void Tick(int deltaTime);
@@ -149,8 +150,12 @@ public:
 class Player : public PhysicsObject {
 private:
 	Vector2 initVelocity;
+
 	int positiveABmultiply;
 	int negativeABmultiply;
+
+	bool decreasePositiveAB;
+	bool decreaseNegativeAB;
 
 	int moveInput;
 	bool shoot;
@@ -175,6 +180,7 @@ public:
 		shoot = Shoot;
 		mousePos = mousePos;
 	}
+	void AddAbility(bool IsPositive);
 	void Tick();
 };
 class Bullet : public PhysicsObject {
