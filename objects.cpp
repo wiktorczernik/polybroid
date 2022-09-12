@@ -140,7 +140,7 @@ void Bullet::Tick(list<Block>& blocks, Player& player) {
 		int newY = std::abs(4 - newX);
 
 		newX *= (bc < pc ? -1 : 1);
-		newY *= std::clamp((currentVelocity.y / std::abs(currentVelocity.y)), -1, 1);
+		newY *= currentVelocity.y != 0 ? std::clamp((currentVelocity.y / std::abs(currentVelocity.y)), -1, 1) : -1;
 
 
 		newY = std::clamp(newY, -3, 3);
@@ -157,7 +157,12 @@ void Bullet::Tick(list<Block>& blocks, Player& player) {
 		
 
 		Move(currentVelocity.x*finalMultiply.x, currentVelocity.y*finalMultiply.y);
-
+		if (CollidesWith(player)) {
+			int by = position.y + (scale.y / 2);
+			int py = player.position.y + (player.scale.y / 2);
+			int a = by < py ? 1 : -1;
+			Move(0, scale.y/ 2 * a);
+		}
 	}
 	bool border[2];
 	if (CollidesBorder(border)) {
@@ -166,6 +171,12 @@ void Bullet::Tick(list<Block>& blocks, Player& player) {
 		}
 		InvertVelocity(border[0], border[1]);
 		Move(currentVelocity.x, currentVelocity.y);
+		if (CollidesWith(player)) {
+			if (currentVelocity.y > 0) {
+				InvertVelocity(false, true);
+			}
+			Move(0, -scale.y);
+		}
 	}
 }
 
@@ -229,7 +240,7 @@ void Player::AddAbility(bool IsPositive) {
 		trigger = &decreaseNegativeAB;
 		break;
 	}
-	newTimer.Setup(trigger, 2000, true);
+	newTimer.Setup(trigger, 10000, true);
 	timers.push_front(newTimer);
 }
 

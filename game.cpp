@@ -55,11 +55,6 @@ private:
 	clock_t currentTickTime;
 
 	void GameTick() {
-		player.UpdateInput(moveInput);
-
-		player.Tick(deltaTime);
-
-
 		abilityTimer.Tick(deltaTime);
 		shootCooldown.Tick(deltaTime);
 
@@ -77,6 +72,10 @@ private:
 		}
 	}
 	void PhysTick() {
+		player.UpdateInput(moveInput);
+
+		player.Tick(deltaTime);
+
 		for (auto& a : abilities) {
 			a.Tick(player);
 		}
@@ -138,6 +137,9 @@ private:
 		return createSprite(Path.string().c_str());
 	}
 	void DrawVisualObject(VisualObject& object) {
+		if (object.sprite == nullptr) {
+			return;
+		}
 		setSpriteSize(object.sprite, object.scale.x, object.scale.y);
 		drawSprite(object.sprite, object.position.x, object.position.y);
 	}
@@ -363,7 +365,7 @@ private:
 				int Axa = std::abs(xa);
 				double ratio = Axa / 4.0;
 				double unwanted = 4.0 * ratio;
-				ya = 4 - unwanted;
+				ya = 3 - unwanted;
 				ya = -ya;
 			}
 
