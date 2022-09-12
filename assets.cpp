@@ -234,4 +234,5 @@ void AssetManager::Setup() {
 	border = GetVisualAsset("border");
 	farlands = GetVisualAsset("farlands");
 	logo = GetVisualAsset("logo");
+	ending = GetVisualAsset("thanks");
 }

@@ -148,14 +148,6 @@ void Bullet::Tick(list<Block>& blocks, Player& player) {
 		currentVelocity.x = newX;
 		currentVelocity.y = newY;
 
-		int speed = std::abs(currentVelocity.x * currentVelocity.y);
-
-		if (speed != 0 && speed != 3) {
-			cout << currentVelocity.x << " + " << currentVelocity.y << " = " << speed << "\n";
-			cout << speed << "\n";
-		}
-		
-
 		Move(currentVelocity.x*finalMultiply.x, currentVelocity.y*finalMultiply.y);
 		if (CollidesWith(player)) {
 			int by = position.y + (scale.y / 2);
@@ -246,15 +238,11 @@ void Player::AddAbility(bool IsPositive) {
 
 void Ability::Tick(Player& player) {
 
-	/*if (CollidesWith(player)) {
-		IsAlive = false;
-	}*/
-
-	bool border[2];
 	if (CollidesWith(player)) {
 		IsAlive = false;
 		player.AddAbility(isPositive);
 	}
+	bool border[2];
 	if (CollidesBorder(border)) {
 		if (border[1] == true && position.y > canvas.MaxY()/2) {
 			IsAlive = false;

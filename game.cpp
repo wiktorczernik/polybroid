@@ -22,6 +22,8 @@ private:
 	BoundingBox borderArea;
 	BoundingBox mapArea;
 
+
+	VisualObject bulletsUI[3];
 	VisualObject border;
 	VisualObject farlands;
 	VisualObject logo;
@@ -289,6 +291,8 @@ private:
 	void NextMap() {
 		mapIndex++;
 		if (mapIndex > 4) {
+			background.sprite = GetSprite(assetManager.ending.sprite);
+			blocks.clear();
 			return;
 		}
 		switch (mapIndex)
@@ -353,27 +357,27 @@ private:
 			NextMap();
 		}
 		if (canShoot && bulletsOnMap < bulletsAmount) {
-			int x = borderArea.MaxX() / 6;
-			int xa = (mousePos.x+bulletSize.x) / x;
+			shootCooldown.Restart();
+			bulletsOnMap++;
 
-			xa = std::clamp(xa - 3, -3, 3);
+			Vector2 velocity = Vector2(2, -2);
+			
+			int mX = mousePos.x;
+			int pX = player.position.x + (player.scale.x / 2);
 
-			int ya = -2;
-			
-			int speed = std::abs(xa * ya);
-			
-			if (speed != 4) {
-				int Axa = std::abs(xa);
-				double ratio = Axa / 4.0;
-				double unwanted = 4.0 * ratio;
-				ya = 3 - unwanted;
-				ya = -ya;
+			bool isCenter = std::abs(pX - mX) < (int)(player.scale.x * 0.66);
+
+			switch (isCenter)
+			{
+			case true:
+				velocity.x = 0;
+				velocity.y = -3;
+				break;
+			case false:
+				velocity.x = mX < pX ? -velocity.x: velocity.x;
+				break;
 			}
 
-			Vector2 velocity = Vector2(xa, ya);
-
-			bulletsOnMap++;
-			shootCooldown.Restart();
 			Vector2 pos = Vector2(player.position.x + (playerSize.x / 2) - (bulletSize.x / 2), player.position.y - (bulletSize.y));
 			InstantiateBullet(pos, velocity);
 		}
@@ -395,9 +399,8 @@ public:
 
 		SetupVariables();
 		SetupOverlay();
-
-		int i = 0;
 		NextMap();
+
 		previousTickTime = clock();
 		return true;
 	}
@@ -425,12 +428,6 @@ public:
 		case FRMouseButton::LEFT:
 			Shoot();
 			break;
-		case FRMouseButton::MIDDLE:
-			break;
-		case FRMouseButton::RIGHT:
-			break;
-		case FRMouseButton::COUNT:
-			break;
 		default:
 			break;
 		}
@@ -445,9 +442,9 @@ public:
 		case FRKey::LEFT:
 			moveInput = -1;
 			break;
-		case FRKey::UP:
+		/*case FRKey::UP:
 			NextMap();
-			break;
+			break;*/
 		default:
 			break;
 		}

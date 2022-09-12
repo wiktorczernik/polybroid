@@ -57,6 +57,7 @@ public:
 	VisualAsset border;
 	VisualAsset farlands;
 	VisualAsset logo;
+	VisualAsset ending;
 
 	GameObjectAsset positiveAbility;
 	GameObjectAsset negativeAbility;
