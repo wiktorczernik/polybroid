@@ -11,10 +11,10 @@ using namespace std;
 
 class Timer {
 private:
-	bool* trigger;
 	unsigned int currentTime;
 	unsigned int triggerTime;
 public:
+	bool* trigger;
 	bool autoRestart;
 	bool triggered;
 	Timer();
@@ -151,11 +151,12 @@ class Player : public PhysicsObject {
 private:
 	Vector2 initVelocity;
 
-	int positiveABmultiply;
-	int negativeABmultiply;
+	int abilityMultiplier;
 
 	bool decreasePositiveAB;
 	bool decreaseNegativeAB;
+
+	list<Timer> timers;
 
 	int moveInput;
 	bool shoot;
@@ -174,6 +175,10 @@ public:
 		currentVelocity = Velocity;
 		idleSprite = IdleSprite;
 		currentSprite = idleSprite;
+		abilityMultiplier = 0;
+
+		decreasePositiveAB = false;
+		decreaseNegativeAB = false;
 	}
 	void UpdateInput(int Move, bool Shoot, Vector2 MousePos) {
 		moveInput = Move;
@@ -181,7 +186,7 @@ public:
 		mousePos = mousePos;
 	}
 	void AddAbility(bool IsPositive);
-	void Tick();
+	void Tick(int deltaTime);
 };
 class Bullet : public PhysicsObject {
 public:

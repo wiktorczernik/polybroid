@@ -12,6 +12,18 @@ struct Vector2 {
 		y = Y;
 	}
 };
+struct Vector2F {
+	float x;
+	float y;
+	Vector2F() {
+		x = 0;
+		y = 0;
+	}
+	Vector2F(float X, float Y) {
+		x = X;
+		y = Y;
+	}
+};
 struct BoundingBox {
 	Vector2 a;
 	Vector2 b;

@@ -44,6 +44,11 @@ private:
 	Timer abilityTimer;
 	bool canAbilitySpawn;
 
+	Timer shootCooldown;
+	bool canShoot;
+	int bulletsAmount;
+	int bulletsOnMap;
+
 	int deltaTime;
 	clock_t previousTickTime;
 	clock_t currentTickTime;
@@ -51,13 +56,14 @@ private:
 	void GameTick() {
 		player.UpdateInput(moveInput, false, Vector2(0, 0));
 
-		player.Tick();
+		player.Tick(deltaTime);
+
 
 		abilityTimer.Tick(deltaTime);
+		shootCooldown.Tick(deltaTime);
 
-		if (canAbilitySpawn) {
+		if (canAbilitySpawn && bulletsAmount > 0) {
 			InstantiateAbility();
-			cout << "\n\n" << "ABILITY CAN SPAWN" << "\n\n";
 		}
 		auto begin = bullets.cbegin();
 
@@ -106,7 +112,11 @@ private:
 			list<Bullet>::const_iterator curr = itr++;
 			if (curr->IsAlive == false) {
 				destroySprite(curr->idleSprite);
-
+				bulletsAmount--;
+				bulletsOnMap--;
+				if (bulletsAmount <= 0) {
+					cout << "\n\nYOU LOST\nPRESS LBM TO RESTART THE GAME\n\n";
+				}
 				bullets.erase(curr);
 			}
 		}
@@ -207,10 +217,16 @@ private:
 		score = 0;
 		blocksToDestroy = 0;
 		mapIndex = -1;
+		bulletsAmount = 3;
+		bulletsOnMap = 0;
 
 		moveInput = 0;
 
-		abilityTimer.Setup(&canAbilitySpawn, 3000, true);
+		canAbilitySpawn = false;
+		canShoot = false;
+
+		abilityTimer.Setup(&canAbilitySpawn, 10000, true);
+		shootCooldown.Setup(&canShoot, 1000, false);
 
 		int squareWidth = std::min(cmdScreen.x, cmdScreen.y);
 		borderArea = BoundingBox(Vector2(0, 0), Vector2(squareWidth, 0), Vector2(0, squareWidth), Vector2(squareWidth, squareWidth));
@@ -240,6 +256,9 @@ private:
 
 		background.sprite = GetSprite(map.background);
 
+		blocksToDestroy = 0;
+		bulletsOnMap = 0;
+		cout << "BULLETS IN MAGAZINE: " << bulletsAmount << '\n';
 		int value = 0;
 		for (int x = 0; x < 16; x++) {
 			for (int y = 0; y < 8; y++) {
@@ -255,8 +274,8 @@ private:
 		}
 
 		abilityTimer.Restart();
+		shootCooldown.Restart();
 		InstantiatePlayer();
-		InstantiateBullet(Vector2(200, 500));
 
 	}
 	void DestroyMap() {
@@ -266,6 +285,10 @@ private:
 	void NextMap() {
 		DestroyMap();
 		mapIndex++;
+		if (mapIndex == 0) {
+			cout << "\n\n" << "WELCOME TO THE POLYBROID" << "\n\n" << "LEFT ARROW & RIGHT ARROW - MOVE" << "\n" << "MOUSE POINTER - AIM" << "\n" << "LMB - SHOOT" << "\n\n";
+		}
+		cout << "\n" << "YOUR CURRENT SCORE IS " << score << " POINTS" << '\n';
 		InstantiateMap(mapIndex);
 	}
 #pragma endregion
@@ -273,7 +296,7 @@ private:
 		GameObjectAsset& asset = assetManager.player;
 		Vector2 position = Vector2(mapArea.MaxX() / 2 - (playerSize.x/2), mapArea.MaxY() * 0.95 - (playerSize.y));
 		Sprite* sprite = GetSprite(asset.idleSprite);
-		Player pl = Player(mapArea, position, playerSize, Vector2(3, 0), sprite);
+		Player pl = Player(mapArea, position, playerSize, Vector2(4, 0), sprite);
 		player = pl;
 	}
 	void InstantiateBlock(BlockAsset& asset, int x, int y) {
@@ -309,6 +332,21 @@ private:
 		
 		abilities.push_front(ability);
 		//currentAbility = ability;
+	}
+	void Shoot() {
+		if (bulletsAmount <= 0) {
+			bulletsAmount = 3;
+			bulletsOnMap = 0;
+			mapIndex = -1;
+			score = 0;
+			NextMap();
+		}
+		if (canShoot && bulletsOnMap < bulletsAmount) {
+			bulletsOnMap++;
+			shootCooldown.Restart();
+			Vector2 pos = Vector2(player.position.x + (playerSize.x / 2) - (bulletSize.x / 2), player.position.y - (bulletSize.y * 2));
+			InstantiateBullet(pos);
+		}
 	}
 
 public:
@@ -352,7 +390,20 @@ public:
 	}
 
 	virtual void onMouseButtonClick(FRMouseButton button, bool isReleased) {
-
+		switch (button)
+		{
+		case FRMouseButton::LEFT:
+			Shoot();
+			break;
+		case FRMouseButton::MIDDLE:
+			break;
+		case FRMouseButton::RIGHT:
+			break;
+		case FRMouseButton::COUNT:
+			break;
+		default:
+			break;
+		}
 	}
 
 	virtual void onKeyPressed(FRKey k) {

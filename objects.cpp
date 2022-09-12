@@ -128,14 +128,54 @@ void Bullet::Tick(list<Block>& blocks, Player& player) {
 	bool border[2];
 	if (CollidesBorder(border)) {
 		if (border[1] == true && position.y > canvas.MaxY() / 2) {
-			//IsAlive = false;
+			IsAlive = false;
 		}
 		InvertVelocity(border[0], border[1]);
 	}
 }
 
-void Player::Tick() {
-	currentVelocity = Vector2(initVelocity.x * moveInput, 0);
+void Player::Tick(int deltaTime) {
+
+	std::list<Timer>::iterator bi = timers.begin();
+
+	list<Timer>::const_iterator bitr = timers.cbegin();
+	while (bitr != timers.cend())
+	{
+		list<Timer>::const_iterator curr = bitr++;
+		if (curr->triggered == true) {
+			timers.erase(curr);
+		}
+	}
+	for (auto& timer : timers) {
+		timer.Tick(deltaTime);
+	}
+	if (decreasePositiveAB) {
+		cout << "old: " << abilityMultiplier << "; new: ";
+		abilityMultiplier = std::clamp(abilityMultiplier - 1, -3, 3);
+		decreasePositiveAB = false;
+		cout << abilityMultiplier << ";\n";
+	}
+	if (decreaseNegativeAB) {
+		cout << "old: " << abilityMultiplier << "; new: ";
+		abilityMultiplier = std::clamp(abilityMultiplier + 1, -3, 3);
+		decreaseNegativeAB = false;
+		cout << abilityMultiplier << ";\n";
+	}
+
+	int xSpeed = initVelocity.x;
+	if (abilityMultiplier != 0) {
+		float mp = (abilityMultiplier > 0 ? 1.4 : 0.6);
+		for (int i = 0; i < std::abs(abilityMultiplier); i++) {
+			xSpeed *= mp;
+		}
+	}
+	int minSpeed = initVelocity.x / 2;
+	int maxSpeed = initVelocity.x * 2;
+	xSpeed = xSpeed != 0 ? ((std::clamp(xSpeed, minSpeed, maxSpeed))*moveInput) : 0;
+
+	currentVelocity = Vector2(xSpeed, 0);
+
+
 	Move(currentVelocity.x, currentVelocity.y);
 	bool border[2];
 	if (CollidesBorder(border)) {
@@ -146,13 +186,21 @@ void Player::Tick() {
 }
 
 void Player::AddAbility(bool IsPositive) {
+	Timer newTimer = Timer();
+	bool* trigger;
 	switch (IsPositive)
 	{
 	case true:
+		abilityMultiplier = std::clamp(abilityMultiplier + 1, -3, 3);
+		trigger = &decreasePositiveAB;
 		break;
 	case false:
+		abilityMultiplier = std::clamp(abilityMultiplier - 1, -3, 3);
+		trigger = &decreaseNegativeAB;
 		break;
 	}
+	newTimer.Setup(trigger, 2000, true);
+	timers.push_front(newTimer);
 }
 
 void Ability::Tick(Player& player) {
@@ -164,6 +212,7 @@ void Ability::Tick(Player& player) {
 	bool border[2];
 	if (CollidesWith(player)) {
 		IsAlive = false;
+		player.AddAbility(isPositive);
 	}
 	if (CollidesBorder(border)) {
 		if (border[1] == true && position.y > canvas.MaxY()/2) {

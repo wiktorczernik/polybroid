@@ -115,11 +115,8 @@ MapAsset AssetManager::GetMapAsset(fs::path path) {
 			for (int y = 0; y < 8; y++) {
 				value = std::stoi(string() + lines[x].at(y));
 				result.terrain[x - 2][y] = value;
-				cout << value;
 			}
-			cout << "\n";
 		}
-		cout << "\n\n\n";
 		return result;
 	}
 	catch (std::exception& e) {
