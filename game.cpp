@@ -351,9 +351,10 @@ private:
 		}
 		if (canShoot && bulletsOnMap < bulletsAmount) {
 			int x = borderArea.MaxX() / 6;
-			int xa = (mousePos.x) / x;
+			int xa = (mousePos.x+bulletSize.x) / x;
 
 			xa = std::clamp(xa - 3, -3, 3);
+
 			int ya = -2;
 			
 			int speed = std::abs(xa * ya);
